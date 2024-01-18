@@ -1,0 +1,118 @@
+﻿@page "/"
+<html>
+    <head>
+    <link rel="stylesheet" href="css/Home.css"/>
+    </head>
+    <div>
+        <TopNavBar></TopNavBar>
+    <div class="slideshow-container">
+        <div class="mySlides fade_img">
+            <div class="numbertext">1 / 3</div>
+            <img src="images/woman3.jpg" style="width:100%">
+            <div class="text_container">
+                <div class="text_top">Popular Collections</div>
+                <div class="text_bottom">
+                    <div>Abstract African woman canvas painting</div>
+                    <a href="#" class="text-success">VIEW AUCTIONS</a>
+                </div>
+                </div>
+        </div>
+
+        <div class="mySlides fade_img">
+            <div class="numbertext">2 / 3</div>
+            <img src="images/woman2.jpg" style="width:100%">
+            <div class="text_container">
+                <div class="text_top">Popular Collections</div>
+                <div class="text_bottom">
+                    <div>Abstract African woman canvas painting</div>
+                    <a href="#" class="text-success">VIEW AUCTIONS</a>
+                </div>
+        </div>
+            
+        </div>
+
+        <div class="mySlides fade_img">
+            <div class="numbertext">3 / 3</div>
+            <img src="images/woman8.jpg" style="width:100%">
+            <div class="text_container">
+                <div class="text_top">Popular Collections</div>
+                <div class="text_bottom">
+                    <div>Abstract African woman canvas painting</div>
+                    <a href="#" class="text-success">VIEW AUCTIONS</a>
+                </div>
+        </div>
+        </div>
+        
+        <a class="prev" onclick="plusSlides(-1)">❮</a>
+        <a class="next" onclick="plusSlides(1)">❯</a>
+
+        <br>
+
+        <div style="text-align:center">
+            <span class="dot" onclick="currentSlide(1)"></span>
+            <span class="dot" onclick="currentSlide(2)"></span>
+            <span class="dot" onclick="currentSlide(3)"></span>
+        </div>
+        <div class="icon_box">
+        <h2>Follow us</h2>
+        <div class="icon_sub">
+            <img class="iconz" src="images/instagram.svg"/>
+            <img class="iconz" src="images/facebook.svg"/>
+                <img class="iconz" src="images/twitter.svg" />
+            <img class="youtube" src="images/youtube (1).svg"/>
+        </div>
+        </div>
+        <div class="footer_home">
+            
+            <div class="footer_link">
+                <p>Support</p>
+                <i class="material-icons">arrow_drop_down</i>
+
+            </div>
+            <hr />
+            <div class="footer_link">
+                <p>Privacy</p>
+                <i class="material-icons">arrow_drop_down</i>
+                
+            </div>
+            <hr />
+        </div>
+    </div>
+    
+
+    <script>
+        let slideIndex = 1;
+        showSlides(slideIndex);
+
+        function plusSlides(n) {
+            showSlides(slideIndex += n);
+        }
+
+        function currentSlide(n) {
+            showSlides(slideIndex = n);
+        }
+
+        function showSlides(n) {
+            let i;
+            let slides = document.getElementsByClassName("mySlides");
+            let dots = document.getElementsByClassName("dot");
+            if (n > slides.length) { slideIndex = 1 }
+            if (n < 1) { slideIndex = slides.length }
+            for (i = 0; i < slides.length; i++) {
+                slides[i].style.display = "none";
+            }
+            for (i = 0; i < dots.length; i++) {
+                dots[i].className = dots[i].className.replace(" active", "");
+            }
+            slides[slideIndex - 1].style.display = "block";
+            dots[slideIndex - 1].className += " active";
+        }
+    </script>
+
+</div>
+
+</html>
+
+@code {
+
+}

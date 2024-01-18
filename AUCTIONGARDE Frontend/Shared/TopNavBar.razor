@@ -1,0 +1,56 @@
+﻿<html>
+<head>
+    <style>
+ 
+        .nav_bar_wapper {
+            display:flex;
+            justify-content:space-between;
+            align-items:center;
+            padding:0 20px;
+          
+        }
+
+        .navbar-title {
+            margin: 0;
+        }
+        .navbar-icons
+        {
+            display:flex;
+            gap:1rem;
+        }
+
+        .navbar-icons i {
+            font-size: 1.5em;
+            color: #48BE1E;
+        }
+
+        .page {
+            /* position: relative; */
+            display: flex;
+            flex-direction: row;
+        }
+
+}
+
+    </style>
+</head>
+<body>
+    <div class="nav_bar_wapper">
+    <div class="sidebar">
+        <NavMenu />
+    </div>
+
+
+        <h1 class="navbar-title"><span style="color: #E9B6FB">Auction</span><span style="color:#48BE1E">Garde</span></h1>
+        <div class="navbar-icons">
+            <a href="#"><i class="material-icons" style="font-size:40px">search</i></a>
+            <a href="/login"> <i class="material-icons" style="font-size:40px">person</i></a>
+        </div>
+    </div>
+ 
+</body>
+</html>
+
+@code {
+
+}

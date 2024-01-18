@@ -1,0 +1,64 @@
+﻿@page "/login"
+@inject NavigationManager navigation
+@inject HttpClient Http
+@inject IJSRuntime _jsRuntime
+<html>
+<head>
+    <link rel="stylesheet" href="/css/LoginUser.css" />
+</head>
+<body>
+    <div class="form_body">
+        <h1 class="navbar-t"><span style="color: #E9B6FB">Log</span><span style="color:#48BE1E">in</span></h1>
+        <EditForm Model="@users" OnValidSubmit="Login">
+             <label for="email">Email:</label><br>
+            <InputText @bind-Value="loginUser.Email" class="form-control input_item" id="email"></InputText><br />
+            <ValidationMessage For="@(()=>loginUser.Email)" />
+            <label for="password">Password:</label><br>
+            <InputText @bind-Value="loginUser.Password" class="form-control input_item" id="password" type="password"></InputText>
+            <ValidationMessage For="@(()=>loginUser.Password)" />
+            <input type="submit" value="Login"><br /><br />
+            <input type="checkbox" id="condition" name="condition">
+            <label for="condition"> Accept terms and conditions</label><br><br />
+            <div class="question_login">
+                <p>New here?<a href="/register" style="color: #E9B6FB">Sign up</a></p>
+            </div>
+
+        </EditForm>
+    </div>
+</body>
+</html>
+
+@code {
+    public LoginUser loginUser = new LoginUser();
+    public List<User> users = new List<User>();
+
+    protected override async Task OnInitializedAsync()
+    {
+
+        //call api to get the products to display
+
+        var userSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/users.json");
+        if (userSaved.Any())
+        {
+            users = userSaved;
+        }
+
+    }
+    private async void Login()
+    {
+        var user = users.Find(x => x.Email == loginUser.Email);
+        if(user == null)
+        {
+            await _jsRuntime.InvokeVoidAsync("ShowMessage", "error", "Invalid credentials");
+            return;
+        }
+        var isValidPassword = user.Password == loginUser.Password;
+        if (!isValidPassword)
+        {
+
+            return;
+        }
+        await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "You are now Logged in!!");
+        Console.WriteLine($"Welcome!!{user.FName}");
+    }
+}

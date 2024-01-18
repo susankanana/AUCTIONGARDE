@@ -1,0 +1,47 @@
+﻿@page "/register"
+@inject NavigationManager navigation
+@inject IJSRuntime _jsRuntime
+<html>
+    <head>
+<link rel="stylesheet" href="/css/RegisterUser.css"/>
+    </head>
+    <body>
+    <div class ="form_body">
+    <h1 class="navbar-t"><span style="color: #E9B6FB">Sign</span>&nbsp<span style="color:#48BE1E">Up</span></h1>
+    <EditForm Model="@registerUser" OnValidSubmit="RegisteredUser">
+        <DataAnnotationsValidator />
+        <label for="fname">First name:</label><br>
+        <InputText @bind-Value="registerUser.FName" class="form-control input_item" id="fname"></InputText><br />
+        <ValidationMessage For="@(()=>registerUser.FName)" />
+        <label for="lname">Last name:</label><br>
+        <InputText @bind-Value="registerUser.LName" class="form-control input_item" id="lname"></InputText><br />
+        <ValidationMessage For="@(()=>registerUser.LName)" />
+        <label for="email">Email:</label><br>
+       <InputText @bind-Value="registerUser.Email" class="form-control input_item" id="email"></InputText><br />
+       <ValidationMessage For="@(()=>registerUser.Email)" />
+        <label for="phone">Phone Number:</label><br>
+        <InputText @bind-Value="registerUser.PhoneNumber" class="form-control input_item" id="phone"></InputText><br />
+            <ValidationMessage For="@(()=>registerUser.PhoneNumber)" />
+        <label for="password">Password:</label><br>
+        <InputText @bind-Value="registerUser.Password" class="form-control input_item"  id="password" type="password"></InputText>
+            <ValidationMessage For="@(()=>registerUser.Password)" />
+        <input type="submit" value="Register"><br /><br />
+        <input type="checkbox" id="condition" name="condition">
+        <label for="condition"> Accept terms and conditions</label><br><br />
+        <div class="question_register">
+                <p>Already have an account?<a href="/login" style="color: #E9B6FB">Login</a></p>
+        </div>
+           
+        </EditForm>
+    </div>
+</body>
+</html>
+
+@code {
+    public RegisterUser registerUser = new RegisterUser();
+    public async Task RegisteredUser()
+    {
+        navigation.NavigateTo("/");
+        await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "Registration was successful!!");
+    }
+}
