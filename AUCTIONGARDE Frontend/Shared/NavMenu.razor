@@ -1,44 +1,4 @@
-﻿@* <div class="top-row ps-3 navbar navbar-dark">
-    <div class="container-fluid">
-        <a class="navbar-brand" href="">AUCTIONGARDE Frontend</a>
-        <button title="Navigation menu" class="navbar-toggler" @onclick="ToggleNavMenu">
-            <span class="navbar-toggler-icon"></span>
-        </button>
-    </div>
-</div>
-
-<div class="@NavMenuCssClass nav-scrollable" @onclick="ToggleNavMenu">
-    <nav class="flex-column">
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="" Match="NavLinkMatch.All">
-                <span class="oi oi-home" aria-hidden="true"></span> Home
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="counter">
-                <span class="oi oi-plus" aria-hidden="true"></span> Counter
-            </NavLink>
-        </div>
-        <div class="nav-item px-3">
-            <NavLink class="nav-link" href="fetchdata">
-                <span class="oi oi-list-rich" aria-hidden="true"></span> Fetch data
-            </NavLink>
-        </div>
-    </nav>
-</div>
-
-@code {
-    private bool collapseNavMenu = true;
-
-    private string? NavMenuCssClass => collapseNavMenu ? "collapse" : null;
-
-    private void ToggleNavMenu()
-    {
-        collapseNavMenu = !collapseNavMenu;
-    }
-}
- *@
- <!DOCTYPE html>
+﻿<!DOCTYPE html>
 <html>
 <head>
 <meta name="viewport" content="width=device-width, initial-scale=1">
@@ -47,24 +7,37 @@
 
 <div id="mySidebar" class="sidebar">
   <a href="javascript:void(0)" class="closebtn" onclick="closeNav()">×</a>
-        <a href="#">
+        <a href="/">
             <i class="material-icons">home</i> Home
         </a>
-        <a href="#">
+        <a href="/auctionbuy">
             <i class="oi oi-cart"></i> Auctions
         </a>
-        <a href="#">
-            <i class="oi oi-cart"></i> Auction State
+        <a href="/auctionstate">
+            <i class="oi oi-loop-circular"></i> Auction State
         </a>
         <div class="dropdown">
             
-            <a class="dropbtn"> Sell<i class="material-icons">arrow_drop_down</i></a>
+            <a class="dropbtn"><i class="material-icons">storefront</i> Sell<i class="material-icons">arrow_drop_down</i></a>
             <div class="dropdown-content">
-                <a href="#">Link 1</a>
-                <a href="#">Link 2</a>
-                <a href="#">Link 3</a>
+                <a href="/addauctionitem">Auction Item +</a>
+                <a href="/auctioneditems">Auctioned Items</a>
+                <a href="/closedauctions">Closed Auctions</a>
             </div>
+            
+            
         </div>
+        @if(authenticated && role == "Admin")
+        {
+            <div class="dropdown">
+                <a class="dropbtn"><i class="material-icons">admin_panel_settings</i> Admin<i class="material-icons">arrow_drop_down</i></a>
+                <div class="dropdown-content">
+                    <a href="/manageusers">Manage Users</a>
+                    <a href="/manageproducts">Manage Products</a>
+
+                </div>
+            </div>
+        }
         
 </div>
 
@@ -87,3 +60,15 @@ function closeNav() {
    
 </body>
 </html> 
+@code{
+    [CascadingParameter]
+    public Task<AuthenticationState> authSate { get; set; }
+    public string role { get; set; }
+    public bool authenticated { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await authSate;
+        role = state.User.FindFirst("role")?.Value;
+        authenticated = state.User.Identity.IsAuthenticated;
+    }
+}

@@ -1,0 +1,155 @@
+﻿*{
+    box-sizing:border-box;
+    margin:0;
+    padding:0;
+}
+.container_auction{
+    
+    width: 100%;
+}
+.active_art{
+    display: grid;
+    padding: 20px;
+    gap: 20px;
+    background-color: #FFF4F9;
+    grid-template-columns: repeat(3,200px);
+    grid-template-rows: repeat(2,150px);
+    grid-template-areas: "image image card" "info info card";
+    justify-content: center;
+   
+}
+.active_image{
+    grid-area:image;
+    position: relative;
+}
+    .active_image img {
+        width: 100%;
+        height: 100%;
+        border-radius: 20px;
+    }
+.active_image_name{
+    position: absolute;
+    bottom: 20px;
+    right: 10px;
+    color: white;
+    padding: 5px;
+    border-radius: 10px;
+    background-color: black;
+    border: 1px solid white;
+    display: flex;
+    align-items: center;
+}
+.active_info {
+    grid-area: info;
+    display: grid;
+    grid-template-rows: 30px 150px;
+    width: 100%;
+    height: 100%;
+    border-radius: 20px;
+    background-color: white;
+    border: 1px solid black;
+    padding: 5px;
+}
+.active_info_details {
+    display: grid;
+    grid-template-columns: 100px 150px 150px;
+    grid-template-rows: 250px;
+    
+}
+.active_info_details_col {
+    display: grid;
+    grid-template-rows: 20px 20px 20px;
+    
+}
+    .active_info_details_col img{
+        margin-left: 30px;
+    }
+.active_card {
+    grid-area: card;
+    background-color: #E9B6FB;
+    border-radius: 20px;
+}
+        .active_card textarea {
+            width: 80%;
+            height: 50%;
+            padding: 20px;
+            margin: 20px;
+            border-radius: 20px;
+            font-size: 25px;
+            border: none;
+        }
+    .active_card button {
+        width: 80%;
+        background-color: #48BE1E;
+        color: white;
+        margin: 20px;
+        padding: 10px 0;
+        border-radius: 10px;
+        border: none;
+    }
+.active_card button:hover {
+    background-color: #45a049;
+}
+        .placeholder-text {
+            white-space: pre-line;
+        }
+.other_art{
+    display: flex;
+    justify-content: space-between;
+    padding: 20px;
+    
+}
+.other_art button{
+    background-color: white;
+    padding: 10px;
+    width: 20%;
+    border: none;
+}
+.arts_container {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    justify-items: center;
+    gap: 10px;
+}
+.card{
+    background-color: #FFF4F9;
+    border-radius: 10px;
+   
+    
+}
+    .card img {
+        margin: 5px;
+        border-radius: 2px;
+    }
+
+.card_info {
+    padding: 10px;
+    
+}
+
+
+@media (max-width:500px)
+{
+    .active_art {
+        display:flex;
+        flex-direction:column;
+        
+    }
+    .active_info_details
+    {
+        display:flex;
+        flex-direction:column;
+    }
+    .active_info
+    {
+        height: 220px;
+
+    }
+    .arts_container {
+        display: grid;
+        grid-template-columns: 1fr;
+        justify-items: center;
+        margin-left:0;
+    }
+    
+}

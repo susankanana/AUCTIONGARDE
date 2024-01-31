@@ -1,0 +1,144 @@
+﻿@page "/auctioneditems"
+@inject HttpClient Http
+@inject NavigationManager _navigationManager
+@inject ILocalStorageService _localStorage
+@inject IUser _userService
+@inject IArt _artService
+@inject IBid _bidService
+<html>
+    <head>
+        <link rel="stylesheet" href="/css/AuctionedItems.css"/>
+    </head>
+    <body>
+        <div >
+        <TopNavBar></TopNavBar>
+        @if (arts != null)
+        {
+            if (activeUser != null)
+            {
+                
+                <h4 class="navbar-t"><span style="color: #E9B6FB">Hi</span>&nbsp<span style="color:#48BE1E">@activeUser.FName @activeUser.LName</span>, here are your auctioned items!!</h4>
+                
+            }
+
+            <div class="bigger_container">
+                @foreach (var art in arts)
+                {
+                        <div class="art_container">
+                            <div class="art_image">
+                                <img class="the_image" src="@art.ArtImage" />
+                                <div>@art.Name</div>
+                            </div>
+                            <div>
+                                <div>"@art.Description"</div>
+                                <div>Start price @art.StartPrice</div>
+
+                            <div>Bids count @getBidCount(art.ArtId)</div>
+                                <div>Highest Bid @highestBid</div>
+                                <div style="color: #48BE1E">Time Left @CalculateTimeRemaining(art)</div>
+                                <div class="buttons">
+                                    <input type="submit" value="Edit" @onclick="() => NavigateToForm(art.ArtId)" class="edit"><br /><br />
+                                <input type="submit" value="Delete" @onclick="() => DeleteItem(art)" class=" delete"><br /><br />
+                                </div>
+                            </div>
+                        </div>
+                    
+                }
+            </div>
+        }
+       
+        </div>
+    </body>
+</html>
+
+@code {
+    public List<User> users = new List<User>();
+    public List<Art> arts = new List<Art>();
+    public List<Bid> bids = new List<Bid>();
+    public User activeUser;
+    public int highestBid;
+
+
+    protected override async Task OnInitializedAsync()
+    {
+        var userId = await _localStorage.GetItemAsStringAsync("userId");
+        var token = await _localStorage.GetItemAsStringAsync("authToken");
+        activeUser = await _userService.GetUserById(userId);
+        Timer timer = new Timer(changeState, null, 0, 1000);
+        // var usersSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/test.json");
+        // if (usersSaved.Any())
+        // {
+        //     users = usersSaved;
+        //     activeUser = usersSaved.Take(1).First();
+
+
+        // }
+        // var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
+        // if (bidsSaved.Any())
+        // {
+        //     bids = bidsSaved;
+        
+
+        // }
+        // var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
+        // if (artSaved.Any())
+        // {
+
+        //     arts =artSaved.Where(x => x.UserId == activeUser.UserId).ToList();
+            
+
+
+
+        // }
+
+        bids = await _bidService.GetAllBids();
+        arts = await _artService.GetArtsByUserId();
+
+    }
+    public void changeState(Object _object)
+    {
+        StateHasChanged();
+
+    }
+    public String CalculateTimeRemaining(Art art)
+    {
+        DateTime currentTime = DateTime.Now;
+
+        TimeSpan time_remaining = art.ExpiryTime - currentTime;
+        String timeInString = $"{time_remaining.Days}d {time_remaining.Hours}H {time_remaining.Minutes}M {time_remaining.Seconds}S";
+        return timeInString;
+
+
+    }
+    public void NavigateToForm(Guid Id)
+    {
+       _navigationManager.NavigateTo($"/editauctionitem/{Id}", forceLoad: true);
+
+    }
+
+    
+
+    public int getBidCount(Guid artId)
+    {
+        Console.WriteLine(artId);
+        var allbids = bids.Where(x => x.artId == artId).ToList();
+        if (allbids.Count < 1)
+        {
+            Console.WriteLine("bids empty");
+
+        }
+        else
+        {
+
+            highestBid = allbids.Max(e => e.bidAmount);
+
+
+        }
+        return allbids.Count();
+        
+    }
+    public void DeleteItem(Art art)
+    {
+        arts.Remove(art);
+    }
+}

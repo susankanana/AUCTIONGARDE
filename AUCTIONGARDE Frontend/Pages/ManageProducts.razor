@@ -1,0 +1,117 @@
+﻿@page "/manageproducts"
+@inject HttpClient Http
+<html>
+<head>
+    <link rel="stylesheet" href="/css/ManageProducts.css" />
+</head>
+<body>
+    <TopNavBar></TopNavBar>
+    <div class="header_top">
+        @if (@admin != null)
+        {
+            <h3 class="navbar-t"><span style="color: #E9B6FB">Hello</span>&nbsp<span style="color:#48BE1E">@admin.FName @admin.LName</span></h3>
+            
+        }
+    </div>
+    
+    <div class="container_auction">
+        
+        @foreach(var art in arts){
+        <div class="container_card">
+            
+            
+                @if (art != null){
+            <div class="image_art">
+                <img src="@art.ArtImage"/>
+            </div>
+            <div class="rows">
+                <p>@art.Name</p>
+                    <p> @CalculateTimeRemaining(art)</p>
+            </div>
+            <div class="rows">
+                <p>Highest bid: @getHighestBid(art.ArtId).highestBid</p>
+                        <p>Bidding state <span style="color: #E9B6FB">@getHighestBid(art.ArtId).State</span></p>
+            </div>
+            <div class="rows">
+                <p>Start price: @art.StartPrice</p>
+                <button class="close_bid">Close Bid</button>
+            </div>
+            <div class="btns">
+                <button class="edit_btn">Edit</button>
+                <button class="delete_btn">Delete</button>
+            </div>
+            }
+            
+        </div>
+        }
+    </div>
+    </body>
+</html>
+
+@code {
+    public List<User> users = new List<User>();
+    public List<Art> arts = new List<Art>();
+    public User admin;
+    public List<Bid> bids = new List<Bid>();
+    protected override async Task OnInitializedAsync()
+    {
+        Timer timer = new Timer(changeState, null, 0, 1000);
+        var usersSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/user.json");
+        if (usersSaved.Any())
+        {
+            Console.WriteLine(usersSaved.Take(1).First().Role);
+            users = usersSaved.Where(x => x.Role != "Admin").ToList();
+
+
+            var _admin = usersSaved.Where(x => x.Role == "Admin").FirstOrDefault();
+            if (_admin != null)
+            {
+                admin = _admin;
+            }
+
+
+
+        }
+        var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
+        if (artSaved.Any())
+        {
+            arts = artSaved;
+
+
+
+        }
+        var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
+        if (bidsSaved.Any())
+        {
+            Console.WriteLine(bids);
+            bids = bidsSaved.Where(x => x.State == "closed").ToList();
+
+        }
+
+    }
+    public Bid getHighestBid(Guid Id)
+    {
+        var bid = bids.Find(x => x.artId == Id);
+        if(bid != null)
+        {
+            return bid;
+        }
+        return new Bid();
+
+    }
+    public void changeState(Object _object)
+    {
+        StateHasChanged();
+
+    }
+    public String CalculateTimeRemaining(Art art)
+    {
+        DateTime currentTime = DateTime.Now;
+
+        TimeSpan time_remaining = art.ExpiryTime - currentTime;
+        String timeInString = $"{time_remaining.Days}d {time_remaining.Hours}H {time_remaining.Minutes}M {time_remaining.Seconds}S";
+        return timeInString;
+
+
+    }
+}

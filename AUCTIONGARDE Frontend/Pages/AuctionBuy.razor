@@ -1,0 +1,266 @@
+﻿@page "/auctionbuy"
+@inject HttpClient Http
+@inject NavigationManager _navigationManager
+@inject IJSRuntime _jsRuntime
+@inject IArt _artService
+
+<html>
+<head>
+    <link rel="stylesheet" href="/css/AuctionBuy.css" />
+</head>
+<body>
+    <div class="container_auction">
+        <TopNavBar></TopNavBar>
+
+        <div class="jumbotron">
+            <p class="mt-4">
+        <input @onkeydown="SearchArt"
+                @bind="_searchTerm"
+                @bind:event="oninput"
+                       type="text"
+                       placeholder="Search for an art..."
+                       class="form-control form-control-lg" />
+            </p>
+        </div>
+
+   
+    <div class="active_art">
+            @if (activeArt != null)
+            {
+        <div class="active_image">
+            <img src="@activeArt.ArtImage"/>
+                
+            <div class="active_image_name">
+                        @if (activeArt.Category == "Diamond")
+                        {
+                            <span><img src="/Images/gem-stone.svg" style="width:20px; height:20px"/></span>
+                        }
+                        <div>@activeArt.Name</div>
+                        
+                    </div>
+        </div>
+        <div class="active_info">
+           
+            <div>
+                <p style="color: #E9B6FB; font-weight:400">INFORMATIONS</p>
+            </div>
+             <div class="active_info_details">
+                        <div><i>"@activeArt.Description"</i></div>
+                        <div>
+                            <p style="color:#919090"><b>Time Left</b></p>
+                            <div style="color: #48BE1E"> @CalculateTimeRemaining(activeArt)</div>
+                            </div>
+                        <div class="active_info_details_col">
+                            <img src="/Images/info-fill.svg"/>
+                            <p><b>Highest Bid</b></p>
+                            <div style="color: #E9B6FB">@highestBid</div>
+                            <p style="font-size: small; color:#919090">You can bid bigger than this number</p>
+                        </div>
+            </div>
+                   
+                
+            
+           
+
+            
+        </div>
+        <div class="active_card">
+                    <textarea class="placeholder-text" placeholder="Starting price
+@activeArt.StartPrice.ToString()" @bind="@bid.bidAmount" pattern="[0-9]*" />
+
+                    <button @onclick="PlaceBid">Place Bid</button>
+        </div>
+            }
+
+    </div>
+    <div class="other_art">
+            <p style="font-size: 20px"><b>Other pieces of art</b></p>
+            <button style="font-size: 20px; color:#E9B6FB ; text-decoration:underline;" @onclick=dispayAll>@toggleShow</button>
+    </div>
+    <div class="arts_container">
+        @if(arts!=null)
+        {
+            @foreach(var art in arts)
+            {
+                <div class="card" style="width:18rem;" @onclick="()=>DisplayOnActiveCard(art)">
+                   <img src="@art.ArtImage"  />
+                        <div class="card_info">
+                            <p><b>@art.Name</b></p>
+                            <p>Time Posted &nbsp<span style="color: #48BE1E;">@CalculateTimeAgo(art)</span></p>
+                   </div>
+                   
+                </div>
+            }
+
+        }
+      
+
+    </div>
+    </div>
+</body>
+</html>
+
+@code {
+    public List<Art> arts = new List<Art>();
+    public List<Art> allArts = new List<Art>();
+    public List<Bid> bids = new List<Bid>();
+    public string _searchTerm { get; set; }
+    public int highestBid;
+     public Bid bid = new Bid();
+    // public class Bid
+    // {
+    //     public int bidAmount { get; set; }
+    //     public int highestBid { get; set; }
+    // }
+    public Art activeArt;
+    public Boolean isShowAll;
+    public String toggleShow;
+
+
+    public Guid guid { get; set; }
+    // public Product editedProduct;
+    protected override async Task OnInitializedAsync()
+    {
+        @if (activeArt != null)
+        {
+            bid.bidAmount = activeArt.StartPrice;
+        }
+
+
+
+        var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
+        if (bidsSaved.Any())
+        {
+            bids = bidsSaved;
+
+
+        }
+        //call api to get the products to display
+
+        //var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/art.json");
+        var artSaved = await _artService.GetAllArts();
+        if (artSaved.Any())
+        {
+            toggleShow = "Show All";
+            arts = artSaved.Take(3).ToList();
+            allArts = artSaved;
+            isShowAll = false;
+            DisplayOnActiveCard(artSaved.Take(1).First());
+
+        }
+
+
+
+
+        Timer time = new Timer(chageState, null, 0, 1000);
+
+
+    }
+
+    private void SearchArt(KeyboardEventArgs args)
+    {
+        if (args.Key == "Enter") // only search if user has clicked on enter then proceed to searchresult page
+        {
+
+            // Filter based on Name or if the search term is part of the description
+
+            arts = arts.Where(x => x.Name.ToLower().Contains(_searchTerm.ToLower()) ||
+             x.Description.ToLower().Contains(_searchTerm.ToLower())
+            ).ToList();
+
+        }
+        return;
+    }
+    public void DisplayOnActiveCard(Art art)
+    {
+        activeArt = art;
+        var allBids = bids.Where(x => x.artId == art.ArtId).ToList();
+        if(allBids.Count<1)
+        {
+            Console.WriteLine("bids empty");
+
+        }else
+        {
+          
+            highestBid = allBids.Max(e => e.bidAmount);
+
+            
+        }
+
+    }
+    public void dispayAll()
+    {
+        if (isShowAll)
+        {
+            arts = allArts.Take(3).ToList();
+            toggleShow = "Show All";
+            isShowAll = false;
+        }
+        else
+        {
+            arts = allArts;
+            isShowAll = true;
+            toggleShow = "Show Less";
+
+
+        }
+
+
+    }
+    public async Task PlaceBid()
+    {
+        if(bid.bidAmount > highestBid)
+        {
+            highestBid = bid.bidAmount;
+        }
+        bid.artId = activeArt.ArtId;
+       // _navigationManager.NavigateTo("/auctionstate");
+        await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "Bid was placed!!");
+    }
+
+    public void chageState(Object state)
+    {
+        StateHasChanged();
+    }
+
+
+    public String CalculateTimeRemaining(Art art)
+    {
+        DateTime currentTime =DateTime.Now;
+
+        TimeSpan time_remaining = art.ExpiryTime - currentTime;
+        String timeInString = $"{time_remaining.Days}d {time_remaining.Hours}H {time_remaining.Minutes}M { time_remaining.Seconds}S";
+        return timeInString;
+
+
+    }
+    public string CalculateTimeAgo(Art art)
+    {
+        DateTime currentTime = DateTime.Now;
+        TimeSpan timePassed = currentTime - art.StartTime;
+
+        if (timePassed.TotalSeconds < 60 && timePassed.TotalSeconds < 0) // Less than a minute
+        {
+            return "Time is up";
+        }
+        else if (timePassed.TotalSeconds < 60)
+        {
+            return $"{(int)timePassed.TotalSeconds} {(timePassed.TotalSeconds == 1 ? "second" : "seconds")} ago";
+        }
+        else if (timePassed.TotalMinutes < 60) // Less than an hour
+        {
+            return $"{(int)timePassed.TotalMinutes} {(timePassed.TotalMinutes == 1 ? "minute" : "minutes")} ago";
+        }
+        else if (timePassed.TotalHours < 24) // Less than a day
+        {
+            return $"{(int)timePassed.TotalHours} {(timePassed.TotalHours == 1 ? "hour" : "hours")} ago";
+        }
+        else // Days or more
+        {
+            return $"{(int)timePassed.TotalDays} {(timePassed.TotalDays == 1 ? "day" : "days")} ago";
+        }
+    }
+
+
+}
+

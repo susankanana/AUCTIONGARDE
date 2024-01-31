@@ -1,5 +1,6 @@
 ﻿@page "/register"
 @inject NavigationManager navigation
+@inject IAuthRegister authServiceRegister
 @inject IJSRuntime _jsRuntime
 <html>
     <head>
@@ -41,6 +42,7 @@
     public RegisterUser registerUser = new RegisterUser();
     public async Task RegisteredUser()
     {
+        await authServiceRegister.Register(registerUser);
         navigation.NavigateTo("/");
         await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "Registration was successful!!");
     }

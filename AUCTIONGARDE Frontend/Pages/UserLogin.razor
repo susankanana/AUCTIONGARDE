@@ -2,6 +2,8 @@
 @inject NavigationManager navigation
 @inject HttpClient Http
 @inject IJSRuntime _jsRuntime
+@inject IAuthLogin authServicelogin
+@inject ILocalStorageService localStorage
 <html>
 <head>
     <link rel="stylesheet" href="/css/LoginUser.css" />
@@ -9,10 +11,10 @@
 <body>
     <div class="form_body">
         <h1 class="navbar-t"><span style="color: #E9B6FB">Log</span><span style="color:#48BE1E">in</span></h1>
-        <EditForm Model="@users" OnValidSubmit="Login">
+        <EditForm Model="@loginUser" OnValidSubmit="Login">
              <label for="email">Email:</label><br>
-            <InputText @bind-Value="loginUser.Email" class="form-control input_item" id="email"></InputText><br />
-            <ValidationMessage For="@(()=>loginUser.Email)" />
+            <InputText @bind-Value="loginUser.UserName" class="form-control input_item" id="email"></InputText><br />
+            <ValidationMessage For="@(()=>loginUser.UserName)" />
             <label for="password">Password:</label><br>
             <InputText @bind-Value="loginUser.Password" class="form-control input_item" id="password" type="password"></InputText>
             <ValidationMessage For="@(()=>loginUser.Password)" />
@@ -30,35 +32,62 @@
 
 @code {
     public LoginUser loginUser = new LoginUser();
-    public List<User> users = new List<User>();
+    // public List<User> users = new List<User>();
 
-    protected override async Task OnInitializedAsync()
+    // protected override async Task OnInitializedAsync()
+    // {
+
+    //     //call api to get the products to display
+
+    //     var userSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/users.json");
+    //     if (userSaved.Any())
+    //     {
+    //         users = userSaved;
+    //     }
+
+    // }
+    private async void Login()
     {
+    //     var user = users.Find(x => x.Email == loginUser.Email);
+    //     if(user == null)
+    //     {
+    //         await _jsRuntime.InvokeVoidAsync("ShowMessage", "error", "Invalid credentials");
+    //         return;
+    //     }
+    //     var isValidPassword = user.Password == loginUser.Password;
+    //     if (!isValidPassword)
+    //     {
 
-        //call api to get the products to display
+    //         return;
+    //     }
+    //     await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "You are now Logged in!!");
+    //     Console.WriteLine($"Welcome!!{user.FName}");
 
-        var userSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/users.json");
-        if (userSaved.Any())
+        var response = await authServicelogin.Login(loginUser);
+        if (response != null && response.Token != null)
         {
-            users = userSaved;
+            //Store the token and update user states
+            //Redirect to another page if needed
+            await SaveTokenToSecureStorage(response.Token);
+            await SaveUserIdToSecureStorage(response.User.Id.ToString());
+            await localStorage.SetItemAsStringAsync("userId", response.User.Id.ToString());
+            await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "You are now Logged in!!");
+            navigation.NavigateTo("/", forceLoad: true);
+
+        }
+        else
+        {
+            await _jsRuntime.InvokeVoidAsync("ShowMessage", "error", "Invalid credentials");
         }
 
     }
-    private async void Login()
+    private async Task SaveTokenToSecureStorage(string Token)
     {
-        var user = users.Find(x => x.Email == loginUser.Email);
-        if(user == null)
-        {
-            await _jsRuntime.InvokeVoidAsync("ShowMessage", "error", "Invalid credentials");
-            return;
-        }
-        var isValidPassword = user.Password == loginUser.Password;
-        if (!isValidPassword)
-        {
+        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "authToken", Token);
+    }
 
-            return;
-        }
-        await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "You are now Logged in!!");
-        Console.WriteLine($"Welcome!!{user.FName}");
+    private async Task SaveUserIdToSecureStorage(string userId)
+    {
+        await _jsRuntime.InvokeVoidAsync("localStorage.setItem", "userId", userId);
     }
 }

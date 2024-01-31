@@ -1,0 +1,103 @@
+﻿@page "/manageusers"
+@inject HttpClient Http
+<html>
+<head>
+    <link rel="stylesheet" href="/css/ManageUsers.css" />
+</head>
+<body>
+    
+        <TopNavBar></TopNavBar>
+    <div class="container_auction">
+        @if(@admin!= null){
+            <h3 class="navbar-t"><span style="color: #E9B6FB">Hello</span>&nbsp<span style="color:#48BE1E">@admin.FName @admin.LName</span></h3>
+        }
+        
+        @foreach (var user in users) { 
+        <div class="container_card">
+            
+            <div class="top_row">
+                <div>
+                    <i class="material-icons" style="color: #E9B6FB;font-size: 80px">person</i>
+                </div>
+                <div>
+                        <div>@user.FName &nbsp @user.LName</div>
+                    <div>@user.Email</div>
+                </div>
+                <div>
+                    <p>Sold: @getArtCount(user.UserId) products</p>
+                    <p>Active Bid: @getBidCount(user.UserId) product</p>
+                        <p>Bought: @getBoughtProduct(user.UserId) product</p>
+                </div>
+                <div>
+                    <button class="view">View</button>
+                </div>
+            </div>
+            <div class="bottom_row">
+                <div>
+                    <button class="email">Email User</button>
+                </div>
+                <div>
+                    <button class="manage">Manage User</button>
+                </div>
+            </div>
+        </div>
+        }
+    </div>
+</body>
+ </html>
+
+
+@code {
+    public List<User> users = new List<User>();
+    public List<Art> arts = new List<Art>();
+    public User admin;
+    public List<Bid> bids = new List<Bid>();
+    protected override async Task OnInitializedAsync()
+    {
+        var usersSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/user.json");
+        if (usersSaved.Any())
+        {
+            Console.WriteLine(usersSaved.Take(1).First().Role);
+            users = usersSaved.Where(x => x.Role != "Admin").ToList();
+
+
+            var _admin = usersSaved.Where(x => x.Role == "Admin").FirstOrDefault();
+            if(_admin != null)
+            {
+                admin = _admin;
+            }
+
+
+
+        }
+        var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
+        if (artSaved.Any())
+        {
+            arts = artSaved;
+
+
+
+        }
+        var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
+        if (bidsSaved.Any())
+        {
+            Console.WriteLine(bids);
+            bids = bidsSaved.Where(x => x.State == "closed").ToList();
+
+        }
+
+    }
+    public int getArtCount(Guid Id)
+    {
+       return arts.Where(x => x.UserId == Id).ToList().Count;
+    }
+
+    public int getBidCount(Guid Id)
+    {
+        return bids.Where(x => x.bidderId == Id && x.State == "open").ToList().Count;
+    }
+    public int getBoughtProduct(Guid Id)
+    {
+        return bids.Where(x => x.bidderId == Id && x.State == "closed" && x.bidAmount == x.highestBid).ToList().Count;
+    }
+}

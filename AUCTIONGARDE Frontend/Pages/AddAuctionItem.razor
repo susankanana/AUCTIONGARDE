@@ -1,0 +1,61 @@
+﻿@page "/addauctionitem"
+@inject NavigationManager navigation
+@inject IJSRuntime _jsRuntime
+@inject HttpClient Http
+
+<html>
+<head>
+    <link rel="stylesheet" href="/css/AddAuctionItem.css" />
+</head>
+<body>
+    <div class="form_body">
+        <h1 class="navbar-t"><span style="color: #E9B6FB">Add an Item to</span>&nbsp<span style="color:#48BE1E">Auction</span></h1>
+        <EditForm Model="@artToAuction" OnValidSubmit="AuctionedItem">
+            <DataAnnotationsValidator />
+            <div class="row">
+
+                <img style="height:50%" src="@(string.IsNullOrWhiteSpace(artToAuction.ArtImage)?
+"https://cdn.pixabay.com/photo/2019/04/01/17/05/the-text-of-the-4095909_1280.jpg":artToAuction.ArtImage)" />
+
+            </div>
+            <label for="image">Item Image:</label><br>
+            <InputText @bind-Value="artToAuction.ArtImage" class="form-control"></InputText>
+            <label for="name">Item name:</label><br>
+            <InputText @bind-Value="artToAuction.Name" class="form-control input_item" id="name"></InputText><br />
+            <ValidationMessage For="@(()=>artToAuction.Name)" />
+            <label for="description">Item Description:</label><br>
+            <InputText @bind-Value="artToAuction.Description" class="form-control input_item" id="description"></InputText><br />
+            <ValidationMessage For="@(()=>artToAuction.Description)" />
+            <label for="startprice">Starting Bidding Price</label><br>
+            <InputNumber @bind-Value="artToAuction.StartPrice" class="form-control input_item" id="startprice"></InputNumber><br />
+            <ValidationMessage For="@(()=>artToAuction.StartPrice)" />
+            <label for="expiry">Expiry Time:</label><br>
+            <InputDate @bind-Value="artToAuction.ExpiryTime" class="form-control input_item" id="expiry"></InputDate><br />
+            <ValidationMessage For="@(()=>artToAuction.ExpiryTime)" />
+            <label for="category">Category:</label><br>
+            <InputSelect @bind-Value="artToAuction.Category" class="form-control input_item" id="category">
+                <option value="">Select a category</option>
+                <option value="diamond">Diamond</option>
+                <option value="gold">Gold</option>
+
+            </InputSelect>
+            <ValidationMessage For="@(()=>artToAuction.Category)" />
+            <input type="submit" value="Add Item to Auction"><br />
+
+        </EditForm>
+    </div>
+</body>
+</html>
+@code {
+    
+    
+    public Art artToAuction = new Art();
+
+    
+    public async Task AuctionedItem()
+    {
+        navigation.NavigateTo("/auctioneditems");
+        await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "Auction item uploaded successfully!!");
+    }
+}
+

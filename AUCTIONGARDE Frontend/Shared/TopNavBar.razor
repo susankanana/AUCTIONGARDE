@@ -1,4 +1,6 @@
-﻿<html>
+﻿@inject ILocalStorageService localStorage
+
+<html>
 <head>
     <style>
  
@@ -43,8 +45,18 @@
 
         <h1 class="navbar-title"><span style="color: #E9B6FB">Auction</span><span style="color:#48BE1E">Garde</span></h1>
         <div class="navbar-icons">
-            <a href="#"><i class="material-icons" style="font-size:40px">search</i></a>
-            <a href="/login"> <i class="material-icons" style="font-size:40px">person</i></a>
+           <AuthorizeView>
+            <Authorized>
+                <p>Hello @name</p>
+                    <a href="/" @oncilck="logOut"> <i class="material-icons" style="font-size:40px">logout</i></a>
+            </Authorized>
+            <NotAuthorized>
+                    <a href="/auctionbuy"><i class="material-icons" style="font-size:40px">search</i></a>
+                    <a href="/login"> <i class="material-icons" style="font-size:40px">person</i></a>
+                    
+            </NotAuthorized>
+           
+            </AuthorizeView>
         </div>
     </div>
  
@@ -52,5 +64,23 @@
 </html>
 
 @code {
+    [CascadingParameter]
+    public Task<AuthenticationState> authSate { get; set; }
+    public string name { get; set; }
+    protected override async Task OnInitializedAsync()
+    {
+        var state = await authSate;
+        name = state.User.FindFirst("name")?.Value;
+    }
+    public async Task logOut()
+    {
 
+        var existingToken = await localStorage.GetItemAsStringAsync("authToken");
+
+        if (!string.IsNullOrEmpty(existingToken))
+        {
+            await localStorage.RemoveItemAsync("authToken");
+        }
+       
+    }
 }

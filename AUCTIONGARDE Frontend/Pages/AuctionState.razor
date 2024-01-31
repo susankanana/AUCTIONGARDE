@@ -1,0 +1,132 @@
+﻿@page "/auctionstate"
+@inject HttpClient Http
+<html>
+<head>
+    <link rel="stylesheet" href="/css/AuctionState.css" />
+</head>
+<body>
+    <TopNavBar></TopNavBar>
+    <div class="container_bid">
+        
+        <p class="title_top">Bid progress</p>
+        @foreach(var bid in bids){
+           bool isClosed = bid.expiryTime < DateTime.Now;
+            bool isWon = bid.highestBid == bid.bidAmount;
+            <div class="card_container">
+            <img src="@getBidImage(bid.artId)"/>
+            <div>
+                    <p>@getBidName(bid.artId)</p>
+                    @* <p>@(bid.State == "closed" ? "Bidding closed" : "Bidding open")</p> *@
+                    <p>@showStringState(isWon,isClosed,bid)</p>
+            </div>
+            <div>
+                <p>Your bid @bid.bidAmount</p>
+                <p>Highest bid @bid.highestBid</p>
+            </div>
+            <div>
+                    <button class="button_email"> @updatebutton(@showStringState(isWon,isClosed,bid))</button>
+                </div>
+        </div>
+        }
+
+</div>
+</body>
+</html>
+
+@code {
+    public List<User> users = new List<User>();
+    public List<Art> arts = new List<Art>();
+    public List<Bid> bids = new List<Bid>();
+    public User activeUser;
+    protected override async Task OnInitializedAsync()
+    {
+        var usersSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/test.json");
+        if (usersSaved.Any())
+        {
+            users = usersSaved;
+            activeUser = usersSaved.Take(1).First();
+
+
+        }
+        var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
+        if (bidsSaved.Any())
+        {
+            Console.WriteLine(bids);
+            bids = bidsSaved;
+
+        }
+        var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
+        if (artSaved.Any())
+        {
+            arts = artSaved.Where(x => x.UserId == activeUser.UserId).ToList();
+
+
+
+        }
+    }
+    public string getBidImage(Guid artId)
+    {
+        var art = arts.Where(x => x.ArtId == artId).FirstOrDefault();
+        if (art != null)
+        {
+            return art.ArtImage;
+        }
+        return "";
+
+    }
+    public string getBidName(Guid artId)
+    {
+        var art = arts.Where(x => x.ArtId == artId).FirstOrDefault();
+        if (art != null)
+        {
+            return art.Name;
+        }
+        return "";
+
+    }
+
+    public string showStringState(bool IsWon,bool IsClosed, Bid bid)
+    {
+        Console.WriteLine(IsClosed);
+        Console.WriteLine(IsWon);
+        Console.WriteLine(bid.highestBid);
+
+        if (IsClosed && IsWon)
+        {
+
+            return "Won";
+        }
+        else if (IsClosed && !IsWon)
+        {
+            return "Lost";
+
+        }
+        else
+        {
+            return "Bidding open";
+
+        }
+        
+    }
+
+    public string updatebutton(string State)
+    {
+        if (State == "Won")
+        {
+
+            return "Checkout";
+        }
+        else if (State == "Lost")
+        {
+            return "Gallery";
+
+        }
+        else
+        {
+            return "Bid again";
+
+        }
+
+    }
+
+}
