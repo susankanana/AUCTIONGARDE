@@ -15,19 +15,30 @@
     gap: 10px;
     margin: 30px;
 }
+.title_top {
+    color: #919090;
+    background-color: #FFF4F9;
+    padding: 10px;
+    width: 100%;
+    font-size: 25px;
+    border-radius: 10px;
+    text-align: center;
+    margin: 20px 0;
+}
 .container_card {
     width: 100%;
     display: grid;
-    grid-template-columns:250px;
+    grid-template-columns: 1fr;
     grid-template-rows: 0.05fr 0.1fr 0.1fr 0.05fr;
     gap: 20px;
     border: 1px solid black;
     padding: 10px;
     border-radius: 10px;
+    
 }
 .image_art{
-    margin-left: 20px;
-    margin-top: 5px;
+   width:100%;
+   
 }
 .image_art img {
     width: 100%;
@@ -37,12 +48,14 @@
 .btns {
     display: flex;
     gap: 20px;
+    width: 100%;
 
 }
 button {
     padding: 10px 25px;
     border: none;
     height: 50px;
+    width: 100%;
 }
 .close_bid {
     background-color: white;

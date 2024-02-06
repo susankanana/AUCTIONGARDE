@@ -1,6 +1,7 @@
 ﻿using ArtService.Data;
 using ArtService.Models;
 using ArtService.Services.IServices;
+using AutoMapper;
 using Microsoft.EntityFrameworkCore;
 
 namespace ArtService.Services
@@ -8,9 +9,11 @@ namespace ArtService.Services
     public class ArtsService : IArt
     {
         private readonly ApplicationDbContext _context;
-        public ArtsService(ApplicationDbContext context)
+        private readonly IMapper _mapper;
+        public ArtsService(ApplicationDbContext context, IMapper mapper)
         {
             _context = context;
+            _mapper = mapper;
         }
         public async Task<string> AddArt(Art art)
         {
@@ -36,9 +39,13 @@ namespace ArtService.Services
             return await _context.Arts.Where(x => x.SellerId == sellerId).ToListAsync();
         }
 
-        public async Task<List<Art>> GetAllArts(string status)
+        public async Task<List<Art>> GetAllArtsStatusTrue(string status)
         {
             return await _context.Arts.Where(a => a.Status == status).ToListAsync();
+        }
+        public async Task<List<Art>> GetAllArts()
+        {
+            return await _context.Arts.ToListAsync();
         }
         public async Task<string> UpdateArtHighestBid(Guid artId, int highestBid)
         {
@@ -61,7 +68,7 @@ namespace ArtService.Services
             var _art = await _context.Arts.Where(x=>x.ArtId == art.ArtId).FirstOrDefaultAsync();
             if (_art != null)
             {
-                _art = art;
+                _mapper.Map(art, _art);
                 await _context.SaveChangesAsync();
                 return "Art updated successfully!!";
             }

@@ -10,6 +10,7 @@ namespace ArtService.Profiles
         public ArtProfile()
         {
             CreateMap<AddArtDto, Art>().ReverseMap();
+            CreateMap<Art, Art>().ReverseMap();
 
         }
     }

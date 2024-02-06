@@ -47,8 +47,8 @@
         <div class="navbar-icons">
            <AuthorizeView>
             <Authorized>
-                <p>Hello @name</p>
-                    <a href="/" @oncilck="logOut"> <i class="material-icons" style="font-size:40px">logout</i></a>
+                <p style="color: #E9B6FB; padding-top: 7px; font-size: 20px">Hello @name</p>
+                    <div  @onclick="logOut"> <i class="material-icons" style="font-size:40px">logout</i></div>
             </Authorized>
             <NotAuthorized>
                     <a href="/auctionbuy"><i class="material-icons" style="font-size:40px">search</i></a>
@@ -74,7 +74,6 @@
     }
     public async Task logOut()
     {
-
         var existingToken = await localStorage.GetItemAsStringAsync("authToken");
 
         if (!string.IsNullOrEmpty(existingToken))

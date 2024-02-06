@@ -40,6 +40,27 @@ namespace AUCTIONGARDE_Frontend.Services.BidS
             }
             return new List<Bid>();
         }
+        public async Task<List<Bid>> GetMostRecentBidsByBidderId()
+        {
+            var token = await _localStorage.GetItemAsStringAsync("authToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var response = await _httpClient.GetAsync($"{BASEURL}/api/Bid/Bidder/MostRecent");
+                var content = await response.Content.ReadAsStringAsync();
+
+                var results = JsonConvert.DeserializeObject<ResponseDto>(content);
+
+                if (results != null && results.IsSuccess)
+                {
+                    if (results.Result != null)
+                    {
+                        return JsonConvert.DeserializeObject<List<Bid>>(results.Result.ToString());
+                    }
+                }
+            }
+            return new List<Bid>();
+        }
 
         public async Task<List<Bid>> GetAllBids()
         {
@@ -96,7 +117,7 @@ namespace AUCTIONGARDE_Frontend.Services.BidS
                 var bodyContent = new StringContent(request, Encoding.UTF8, "application/json");
                 //communicate wih Api
 
-                var response = await _httpClient.PutAsync($"{BASEURL}/api/Bid", bodyContent);
+                var response = await _httpClient.PostAsync($"{BASEURL}/api/Bid", bodyContent);
                 var content = await response.Content.ReadAsStringAsync();
 
                 var results = JsonConvert.DeserializeObject<ResponseDto>(content);
@@ -144,5 +165,101 @@ namespace AUCTIONGARDE_Frontend.Services.BidS
             return false;
         }
 
+        public async Task<bool> DeleteAllBidsRelatedToArt(Guid artId)
+        {
+
+
+            var token = await _localStorage.GetItemAsStringAsync("authToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+
+                var response = await _httpClient.DeleteAsync($"{BASEURL}/api/Bid/{artId}");
+                var content = await response.Content.ReadAsStringAsync();
+
+                var results = JsonConvert.DeserializeObject<ResponseDto>(content);
+
+                if (results != null && results.IsSuccess)
+                {
+                    if (results.Result != null)
+                    {
+                        return true;
+                    }
+                }
+            }
+            return false;
+        }
+
+        public async Task<List<Bid>> GetWonBids()
+        {
+            var token = await _localStorage.GetItemAsStringAsync("authToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var response = await _httpClient.GetAsync($"{BASEURL}/api/Bid/Expired");
+                var content = await response.Content.ReadAsStringAsync();
+
+                var results = JsonConvert.DeserializeObject<ResponseDto>(content);
+
+                if (results != null && results.IsSuccess)
+                {
+                    if (results.Result != null)
+                    {
+                        return JsonConvert.DeserializeObject<List<Bid>>(results.Result.ToString());
+                    }
+                }
+            }
+            return new List<Bid>();
+        }
+
+        public async Task<List<Bid>> GetWonBidsOfSellersArt(Guid sellerId)
+        {
+            var token = await _localStorage.GetItemAsStringAsync("authToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                _httpClient.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", token);
+                var response = await _httpClient.GetAsync($"{BASEURL}/api/Bid/Won/Seller{sellerId}");
+                var content = await response.Content.ReadAsStringAsync();
+
+                var results = JsonConvert.DeserializeObject<ResponseDto>(content);
+
+                if (results != null && results.IsSuccess)
+                {
+                    if (results.Result != null)
+                    {
+                        return JsonConvert.DeserializeObject<List<Bid>>(results.Result.ToString());
+                    }
+                }
+            }
+            return new List<Bid>();
+        }
+
+        public async Task<ResponseDto> UpdateBid(Bid bid)
+        {
+            var token = await _localStorage.GetItemAsStringAsync("authToken");
+            if (!string.IsNullOrEmpty(token))
+            {
+                var request = JsonConvert.SerializeObject(bid);
+                var bodyContent = new StringContent(request, Encoding.UTF8, "application/json");
+
+                var response = await _httpClient.PutAsync($"{BASEURL}/api/Bid", bodyContent);
+                if (response.IsSuccessStatusCode)
+                {
+                    var content = await response.Content.ReadAsStringAsync();
+                    if (!string.IsNullOrEmpty(content))
+                    {
+                        var results = JsonConvert.DeserializeObject<ResponseDto>(content);
+                        if (results != null && results.IsSuccess)
+                        {
+                            if (results.Result != null)
+                            {
+                                return results;
+                            }
+                        }
+                    }
+                }
+            }
+            return new ResponseDto();
+        }
     }
 }

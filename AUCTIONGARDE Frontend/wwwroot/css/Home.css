@@ -12,7 +12,7 @@ body {
 .mySlides {
     display: block;
     width: 100%;
-    height:60%;
+    height:70%;
 }
 
 img {
@@ -28,7 +28,7 @@ img {
     width: 100vw;
     position: relative;
     margin: auto;
-    height:120vh;
+    height:100vh;
     overflow:hidden;
 }
 
@@ -78,6 +78,7 @@ img {
     width: 40%;
     border-radius: 10px;
 }
+
 /* Caption text */
 .text_top {
     color: black;
@@ -135,9 +136,46 @@ img {
     display: flex;
     justify-content: space-between;
     padding: 0 30px;
-    flex-direction: row;
+    flex-direction: column;
     width: 100%;
    
+}
+
+.mycontent, .mycontent2 {
+    width: 100%;
+    display: none;
+}
+
+.show_content
+{
+    display:unset;
+}
+
+.support_div, .privacy_div {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+.collapsible {
+    background-color: #777;
+    color: white;
+    cursor: pointer;
+    padding: 18px;
+    border: none;
+    text-align: left;
+    outline: none;
+    font-size: 15px;
+}
+
+    .active, .collapsible:hover {
+        background-color: #555;
+    }
+
+.content {
+    padding: 0 18px;
+    display: none;
+    overflow: hidden;
+    background-color: #f1f1f1;
 }
 /* The dots/bullets/indicators */
 .dot {
@@ -159,6 +197,10 @@ img {
 .fade_img {
     animation-name: fade;
     animation-duration: 1.5s;
+}
+
+.hidden {
+    display: none;
 }
 
 

@@ -1,16 +1,22 @@
 ﻿@page "/manageusers"
 @inject HttpClient Http
+@inject ILocalStorageService _localStorage
+@inject IUser _userService
+@inject IArt _artService
+@inject IBid _bidService
 <html>
 <head>
     <link rel="stylesheet" href="/css/ManageUsers.css" />
 </head>
 <body>
     
-        <TopNavBar></TopNavBar>
+     <TopNavBar></TopNavBar>
+    
     <div class="container_auction">
-        @if(@admin!= null){
+        @* @if(@admin!= null){
             <h3 class="navbar-t"><span style="color: #E9B6FB">Hello</span>&nbsp<span style="color:#48BE1E">@admin.FName @admin.LName</span></h3>
-        }
+        } *@
+        <div class="title_top">ADMIN PANEL : MANAGE USERS</div>
         
         @foreach (var user in users) { 
         <div class="container_card">
@@ -24,23 +30,24 @@
                     <div>@user.Email</div>
                 </div>
                 <div>
-                    <p>Sold: @getArtCount(user.UserId) products</p>
-                    <p>Active Bid: @getBidCount(user.UserId) product</p>
-                        <p>Bought: @getBoughtProduct(user.UserId) product</p>
+                    <p>Sold: @getArtCount(user.Id) products</p>
+                        <p><b>@getBidCount(user.Id)</b> Active Bids</p>
+                        <p><b>@getWonBids(user.Id)</b> Won bids</p>
                 </div>
-                <div>
+                @* <div>
                     <button class="view">View</button>
-                </div>
+                </div> *@
             </div>
             <div class="bottom_row">
-                <div>
+                <div class="bottom_btn">
                     <button class="email">Email User</button>
                 </div>
-                <div>
-                    <button class="manage">Manage User</button>
+                    <div class="bottom_btn">
+                        <button class="manage" @onclick="()=>RemoveUser(user.Id.ToString())">Remove User</button>
                 </div>
             </div>
         </div>
+        <hr />
         }
     </div>
 </body>
@@ -54,50 +61,61 @@
     public List<Bid> bids = new List<Bid>();
     protected override async Task OnInitializedAsync()
     {
-        var usersSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/user.json");
+        var userId = await _localStorage.GetItemAsStringAsync("userId");
+        var token = await _localStorage.GetItemAsStringAsync("authToken");
+        admin = await _userService.GetUserById(userId);
+        arts = await _artService.GetAllArts();
+        bids = await _bidService.GetAllBids();
+        // var usersSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/user.json");
+        var usersSaved = await _userService.GetAllUsers();
         if (usersSaved.Any())
         {
-            Console.WriteLine(usersSaved.Take(1).First().Role);
-            users = usersSaved.Where(x => x.Role != "Admin").ToList();
+            // Console.WriteLine(usersSaved.Take(1).First().Role);
+            users = usersSaved.Where(x => x.UserName != "suzzannekans@gmail.com").ToList();
 
 
-            var _admin = usersSaved.Where(x => x.Role == "Admin").FirstOrDefault();
-            if(_admin != null)
-            {
-                admin = _admin;
-            }
-
-
-
-        }
-        var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
-        if (artSaved.Any())
-        {
-            arts = artSaved;
+            // var _admin = usersSaved.Where(x => x.Role == "Admin").FirstOrDefault();
+            // if(_admin != null)
+            // {
+            //     admin = _admin;
+            // }
 
 
 
         }
-        var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
-        if (bidsSaved.Any())
-        {
-            Console.WriteLine(bids);
-            bids = bidsSaved.Where(x => x.State == "closed").ToList();
+        // var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
+        // if (artSaved.Any())
+        // {
+        //     arts = artSaved;
 
-        }
+
+
+        // }
+        // var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
+        // if (bidsSaved.Any())
+        // {
+        //     Console.WriteLine(bids);
+        //     bids = bidsSaved.Where(x => x.State == "closed").ToList();
+
+        // }
 
     }
-    public int getArtCount(Guid Id)
+    public int getArtCount(Guid userId)
     {
-       return arts.Where(x => x.UserId == Id).ToList().Count;
+        return arts.Where(x => x.SellerId == userId).ToList().Count;
     }
 
-    public int getBidCount(Guid Id)
+    public int getBidCount(Guid userId)
     {
-        return bids.Where(x => x.bidderId == Id && x.State == "open").ToList().Count;
+        return bids.Where(x => x.bidderId == userId && x.Status=="True").ToList().Count;
     }
-    public int getBoughtProduct(Guid Id)
+    public int getWonBids(Guid userId)
     {
-        return bids.Where(x => x.bidderId == Id && x.State == "closed" && x.bidAmount == x.highestBid).ToList().Count;
+        return bids.Where(x => x.bidderId == userId && x.Status == "False" && x.bidAmount == x.highestBid).ToList().Count;
+    }
+
+    public async Task RemoveUser(string userId)
+    {
+        await _userService.RemoveUser(userId);
     }
 }

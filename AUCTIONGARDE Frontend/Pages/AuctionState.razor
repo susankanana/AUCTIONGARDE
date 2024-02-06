@@ -1,5 +1,11 @@
 ﻿@page "/auctionstate"
 @inject HttpClient Http
+@inject ILocalStorageService _localStorage
+@inject IUser _userService
+@inject IBid _bidService
+@inject IArt _artService
+@inject IOrder _orderService
+@inject NavigationManager _navigationManager
 <html>
 <head>
     <link rel="stylesheet" href="/css/AuctionState.css" />
@@ -24,7 +30,9 @@
                 <p>Highest bid @bid.highestBid</p>
             </div>
             <div>
-                    <button class="button_email"> @updatebutton(@showStringState(isWon,isClosed,bid))</button>
+                    <button class="button_email" @onclick="() => HandleButtonClick(bid, showStringState(isWon, isClosed, bid))">
+                        @updatebutton(showStringState(isWon, isClosed, bid))
+                    </button>
                 </div>
         </div>
         }
@@ -37,38 +45,46 @@
     public List<User> users = new List<User>();
     public List<Art> arts = new List<Art>();
     public List<Bid> bids = new List<Bid>();
+    public AddOrderDto order = new AddOrderDto();
     public User activeUser;
     protected override async Task OnInitializedAsync()
     {
-        var usersSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/test.json");
-        if (usersSaved.Any())
-        {
-            users = usersSaved;
-            activeUser = usersSaved.Take(1).First();
+        var userId = await _localStorage.GetItemAsStringAsync("userId");
+        activeUser = await _userService.GetUserById(userId);
+        bids = await _bidService.GetMostRecentBidsByBidderId();
+        arts = await _artService.GetAllArts();
+        Console.WriteLine(arts);
+        // var usersSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/test.json");
+        // if (usersSaved.Any())
+        // {
+        //     users = usersSaved;
+        //     activeUser = usersSaved.Take(1).First();
 
 
-        }
-        var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
-        if (bidsSaved.Any())
-        {
-            Console.WriteLine(bids);
-            bids = bidsSaved;
+        // }
+        // var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
+        // if (bidsSaved.Any())
+        // {
+        //     Console.WriteLine(bids);
+        //     bids = bidsSaved;
 
-        }
-        var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
-        if (artSaved.Any())
-        {
-            arts = artSaved.Where(x => x.UserId == activeUser.UserId).ToList();
+        // }
+        // var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
+        // if (artSaved.Any())
+        // {
+        //     arts = artSaved.Where(x => x.SellerId == activeUser.UserId).ToList();
 
 
 
-        }
+        // }
     }
     public string getBidImage(Guid artId)
     {
         var art = arts.Where(x => x.ArtId == artId).FirstOrDefault();
+
         if (art != null)
         {
+
             return art.ArtImage;
         }
         return "";
@@ -79,6 +95,7 @@
         var art = arts.Where(x => x.ArtId == artId).FirstOrDefault();
         if (art != null)
         {
+
             return art.Name;
         }
         return "";
@@ -87,13 +104,13 @@
 
     public string showStringState(bool IsWon,bool IsClosed, Bid bid)
     {
-        Console.WriteLine(IsClosed);
-        Console.WriteLine(IsWon);
-        Console.WriteLine(bid.highestBid);
+        // Console.WriteLine(IsClosed);
+        // Console.WriteLine(IsWon);
+        // Console.WriteLine(bid.highestBid);
 
         if (IsClosed && IsWon)
         {
-
+            // order.BidId = bid.bidId;
             return "Won";
         }
         else if (IsClosed && !IsWon)
@@ -106,7 +123,7 @@
             return "Bidding open";
 
         }
-        
+
     }
 
     public string updatebutton(string State)
@@ -127,6 +144,31 @@
 
         }
 
+    }
+    public async Task HandleButtonClick(Bid activeBid, string state)
+    {
+       
+        if (state == "Won")
+        {
+            order.BidId = activeBid.bidId;
+            await _orderService.MakeOrder(order);
+            var userId = await _localStorage.GetItemAsStringAsync("userId");
+            var orders = await _orderService.GetOrdersByUserId(new Guid(userId));
+            var orderPlaced = orders.Where(x => x.BidId == order.BidId).FirstOrDefault();
+            if (orderPlaced != null)
+            {
+                _navigationManager.NavigateTo($"/checkout/{orderPlaced.OrderId}", forceLoad: true);
+            }
+        }
+        else if (state == "Lost")
+        {
+            _navigationManager.NavigateTo("/auctionbuy");
+        }
+        else
+        {
+            _navigationManager.NavigateTo($"/auctionbuy/update/{activeBid.artId}");
+        }
+        
     }
 
 }

@@ -1,5 +1,10 @@
 ﻿@page "/manageproducts"
 @inject HttpClient Http
+@inject IUser _userService
+@inject ILocalStorageService _localStorage
+@inject IArt _artService
+@inject IBid _bidService
+@inject NavigationManager _navigationManager
 <html>
 <head>
     <link rel="stylesheet" href="/css/ManageProducts.css" />
@@ -7,11 +12,12 @@
 <body>
     <TopNavBar></TopNavBar>
     <div class="header_top">
-        @if (@admin != null)
+        @* @if (@admin != null)
         {
             <h3 class="navbar-t"><span style="color: #E9B6FB">Hello</span>&nbsp<span style="color:#48BE1E">@admin.FName @admin.LName</span></h3>
             
-        }
+        } *@
+        <div class="title_top">ADMIN PANEL : MANAGE PRODUCTS</div>
     </div>
     
     <div class="container_auction">
@@ -29,16 +35,18 @@
                     <p> @CalculateTimeRemaining(art)</p>
             </div>
             <div class="rows">
-                <p>Highest bid: @getHighestBid(art.ArtId).highestBid</p>
-                        <p>Bidding state <span style="color: #E9B6FB">@getHighestBid(art.ArtId).State</span></p>
+                @* <p>Highest bid: @getHighestBid(art.ArtId).highestBid</p> *@
+                        <p>Highest bid: @art.HighestBid</p>
+                        @* <p>Bidding state <span style="color: #E9B6FB">@getHighestBid(art.ArtId).Status</span></p> *@
+                        <p>Bidding state <span style="color: #E9B6FB">@art.Status</span></p>
             </div>
             <div class="rows">
                 <p>Start price: @art.StartPrice</p>
-                <button class="close_bid">Close Bid</button>
+                <button class="close_bid" @onclick="() => DeleteAllBids(art.ArtId)">Close All Bids</button>
             </div>
             <div class="btns">
-                <button class="edit_btn">Edit</button>
-                <button class="delete_btn">Delete</button>
+                        <button class="edit_btn" @onclick="() => NavigateToForm(art.ArtId)">Edit</button>
+                        <button class="delete_btn" @onclick="() => DeleteItem(art.ArtId)">Delete</button>
             </div>
             }
             
@@ -56,49 +64,52 @@
     protected override async Task OnInitializedAsync()
     {
         Timer timer = new Timer(changeState, null, 0, 1000);
-        var usersSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/user.json");
-        if (usersSaved.Any())
-        {
-            Console.WriteLine(usersSaved.Take(1).First().Role);
-            users = usersSaved.Where(x => x.Role != "Admin").ToList();
+        var userId = await _localStorage.GetItemAsStringAsync("userId");
+        admin = await _userService.GetUserById(userId);
+        arts = await _artService.GetAllArts();
+        // var usersSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/user.json");
+        // if (usersSaved.Any())
+        // {
+        //     Console.WriteLine(usersSaved.Take(1).First().Role);
+        //     users = usersSaved.Where(x => x.Role != "Admin").ToList();
 
 
-            var _admin = usersSaved.Where(x => x.Role == "Admin").FirstOrDefault();
-            if (_admin != null)
-            {
-                admin = _admin;
-            }
-
-
-
-        }
-        var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
-        if (artSaved.Any())
-        {
-            arts = artSaved;
+        //     var _admin = usersSaved.Where(x => x.Role == "Admin").FirstOrDefault();
+        //     if (_admin != null)
+        //     {
+        //         admin = _admin;
+        //     }
 
 
 
-        }
-        var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
-        if (bidsSaved.Any())
-        {
-            Console.WriteLine(bids);
-            bids = bidsSaved.Where(x => x.State == "closed").ToList();
+        // }
+        // var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
+        // if (artSaved.Any())
+        // {
+        //     arts = artSaved;
 
-        }
 
-    }
-    public Bid getHighestBid(Guid Id)
-    {
-        var bid = bids.Find(x => x.artId == Id);
-        if(bid != null)
-        {
-            return bid;
-        }
-        return new Bid();
+
+        // }
+        // var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
+        // if (bidsSaved.Any())
+        // {
+        //     Console.WriteLine(bids);
+        //     bids = bidsSaved.Where(x => x.Status == "closed").ToList();
+
+        // }
 
     }
+    // public Bid getHighestBid(Guid Id)
+    // {
+    //     var bid = bids.Find(x => x.artId == Id);
+    //     if(bid != null)
+    //     {
+    //         return bid;
+    //     }
+    //     return new Bid();
+
+    // }
     public void changeState(Object _object)
     {
         StateHasChanged();
@@ -113,5 +124,18 @@
         return timeInString;
 
 
+    }
+    public void NavigateToForm(Guid Id)
+    {
+        _navigationManager.NavigateTo($"/editauctionitem/{Id}", forceLoad: true);
+
+    }
+    public void DeleteItem(Guid artId)
+    {
+        _artService.DeleteArt(artId);
+    }
+    public void DeleteAllBids(Guid artId)
+    {
+        _bidService.DeleteAllBidsRelatedToArt(artId);
     }
 }

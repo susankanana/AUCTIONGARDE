@@ -23,9 +23,13 @@ namespace OrderService.Services
             _userService = userService;
             _messageBus = messageBus;
         }
-        public async Task<Order> GetOrderByUserId(Guid userId)
+        public async Task<List<Order>> GetOrderByUserId(Guid userId)
         {
-            return await _context.Orders.Where(x => x.UserId == userId).FirstOrDefaultAsync();
+            return await _context.Orders.Where(x => x.UserId == userId).ToListAsync();
+        }
+        public async Task<Order> GetOrderById(Guid orderId)
+        {
+            return await _context.Orders.Where(x => x.OrderId == orderId).FirstOrDefaultAsync();
         }
 
         public async Task<string> MakeOrder(Order order)

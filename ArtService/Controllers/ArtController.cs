@@ -47,7 +47,7 @@ namespace ArtService.Controllers
         [HttpPut("State")]
         public async Task<ActionResult<ResponseDto>> UpdateArtState()
         {
-            var arts = await _artService.GetAllArts("True");
+            var arts = await _artService.GetAllArtsStatusTrue("True");
 
             foreach (var art in arts)
             {
@@ -98,13 +98,13 @@ namespace ArtService.Controllers
 
         }
 
-        [HttpGet]
+        [HttpGet("True")]
         
 
-        public async Task<ActionResult<ResponseDto>> GetAllArts()
+        public async Task<ActionResult<ResponseDto>> GetAllArtsStatusTrue()
         {
 
-            var arts = await _artService.GetAllArts("True");
+            var arts = await _artService.GetAllArtsStatusTrue("True");
             var expiredArts = arts.Where(art=> art.ExpiryTime < DateTime.Now).ToList();
             if(expiredArts.Count > 0)
             {
@@ -125,6 +125,15 @@ namespace ArtService.Controllers
 
         }
 
+        [HttpGet]
+
+        public async Task<ActionResult<ResponseDto>> GetAllArts()
+        {
+            var arts = await _artService.GetAllArts();
+            _response.Result = arts;
+            return Ok(_response);
+        }
+
         [HttpPut]
         [Authorize(Roles = "Admin, Seller")]
         public async Task<ActionResult<ResponseDto>> UpdateArt(Art art)
@@ -132,7 +141,7 @@ namespace ArtService.Controllers
             
             var res = await _artService.UpdateArt(art);
             _response.Result = res;
-            return Ok(res);
+            return Ok(_response);
         }
 
         [HttpDelete("{Id}")]

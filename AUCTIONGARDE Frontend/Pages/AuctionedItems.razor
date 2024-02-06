@@ -27,18 +27,25 @@
                         <div class="art_container">
                             <div class="art_image">
                                 <img class="the_image" src="@art.ArtImage" />
+                            <div class="active_image_name">
+                                @if (art.Category == "Diamond")
+                                {
+                                    <span><img src="/Images/gem-stone.svg" style="width:20px; height:20px" /></span>
+                                }
                                 <div>@art.Name</div>
-                            </div>
-                            <div>
-                                <div>"@art.Description"</div>
-                                <div>Start price @art.StartPrice</div>
 
-                            <div>Bids count @getBidCount(art.ArtId)</div>
-                                <div>Highest Bid @highestBid</div>
+                            </div>
+                            </div>
+                            <div class="art_content">
+                            <div><b><i>"@art.Description"</i></b></div>
+                            <div>Start price <b>@art.StartPrice</b></div>
+
+                            <div>Bids count <b>@getBidCount(art.ArtId)</b></div>
+                            <div>Highest Bid <b>@highestBid</b></div>
                                 <div style="color: #48BE1E">Time Left @CalculateTimeRemaining(art)</div>
                                 <div class="buttons">
                                     <input type="submit" value="Edit" @onclick="() => NavigateToForm(art.ArtId)" class="edit"><br /><br />
-                                <input type="submit" value="Delete" @onclick="() => DeleteItem(art)" class=" delete"><br /><br />
+                                <input type="submit" value="Delete" @onclick="() => DeleteItem(art.ArtId)" class=" delete"><br /><br />
                                 </div>
                             </div>
                         </div>
@@ -77,7 +84,7 @@
         // if (bidsSaved.Any())
         // {
         //     bids = bidsSaved;
-        
+
 
         // }
         // var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
@@ -85,7 +92,7 @@
         // {
 
         //     arts =artSaved.Where(x => x.UserId == activeUser.UserId).ToList();
-            
+
 
 
 
@@ -112,11 +119,11 @@
     }
     public void NavigateToForm(Guid Id)
     {
-       _navigationManager.NavigateTo($"/editauctionitem/{Id}", forceLoad: true);
+        _navigationManager.NavigateTo($"/editauctionitem/{Id}", forceLoad: true);
 
     }
 
-    
+
 
     public int getBidCount(Guid artId)
     {
@@ -135,10 +142,11 @@
 
         }
         return allbids.Count();
-        
+
     }
-    public void DeleteItem(Art art)
+    public void DeleteItem(Guid artId)
     {
-        arts.Remove(art);
+        // arts.Remove(art);
+        _artService.DeleteArt(artId);
     }
 }

@@ -18,9 +18,9 @@ namespace AUCTIONGARDE_Frontend.Models.Arts
 
         public string Description { get; set; }
         public string ArtImage { get; set; }
-        //public Guid SellerId { get; set; }
-        public Guid UserId { get; set; }
+        public Guid SellerId { get; set; }
 
+        public int HighestBid { get; set; } = 0;
         public string Category { get; set; }
 
     }

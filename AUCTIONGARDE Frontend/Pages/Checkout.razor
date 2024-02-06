@@ -1,0 +1,71 @@
+﻿@page "/checkout/{orderId}"
+@inject IOrder _orderService
+@inject IArt _artService
+@inject ILocalStorageService _localStorage
+@inject IJSRuntime _jsRuntime
+
+<html>
+<head>
+    <link rel="stylesheet" href="/css/Checkout.css" />
+</head>
+<body>
+    
+    <div class="card_container">
+        <TopNavBar></TopNavBar>
+        <div class="card">
+            <img src="@getOrderImage(@order.ArtId)" />
+            <div>
+                <p>@order.OrderName </p>
+                <p>Bidding won</p>
+            </div>
+            <div>
+                <p>Amount due: Ksh @order.OrderTotal</p>
+                <button class="btn_pay"@onclick="()=>MakePayment(orderId)">Pay Now</button>
+            </div>
+
+        </div>
+        <hr />
+        
+</div>
+</body>
+</html>
+
+
+@code {
+    [Parameter]
+    public string orderId { get; set; }//I'll be expecting this to be passed to me from the route
+    public Order order = new Order();
+    public List<Art> arts = new List<Art>();
+    protected override async Task OnInitializedAsync()
+    {
+
+        Console.WriteLine(orderId);
+        var userId = await _localStorage.GetItemAsStringAsync("userId");
+        order = await _orderService.GetOrderById(new Guid(orderId));
+        arts = await _artService.GetAllArts();
+    }
+    public string getOrderImage(Guid artId)
+    {
+        var art = arts.Where(x => x.ArtId == artId).FirstOrDefault();
+
+        if (art != null)
+        {
+
+            return art.ArtImage;
+        }
+        return "";
+
+    }
+    public async Task MakePayment(string orderId)
+    {
+        StripeRequestDto sr = new StripeRequestDto()
+            {
+                OrderId = new Guid(orderId),
+                ApprovedUrl = "https://kawaiitherapy.com/",
+                CancelUrl = "https://quickdraw.withgoogle.com/"
+
+            };
+        await _orderService.MakePayments(sr);
+        await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "Payment made successfully!!");
+    }
+}

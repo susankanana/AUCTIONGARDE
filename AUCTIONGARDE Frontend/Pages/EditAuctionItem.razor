@@ -2,6 +2,8 @@
 @inject NavigationManager navigation
 @inject IJSRuntime _jsRuntime
 @inject HttpClient Http
+@inject IArt _artService
+
 
 <html>
 <head>
@@ -35,12 +37,12 @@
             <label for="category">Category:</label><br>
             <InputSelect @bind-Value="artToAuction.Category" class="form-control input_item" id="category">
                 <option value="">Select a category</option>
-                <option value="diamond">Diamond</option>
-                <option value="gold">Gold</option>
+                <option value="Diamond">Diamond</option>
+                <option value="Gold">Gold</option>
          
             </InputSelect>
             <ValidationMessage For="@(()=>artToAuction.Category)" />
-            <input type="submit" value="Edit item Auctioned"><br />
+            <input type="submit" value="Edit item Auctioned" @onclick="()=>EditArt(artToAuction)"><br />
 
         </EditForm>
     </div>
@@ -57,24 +59,31 @@
     {
         Console.WriteLine(auctionItemId);
         Console.WriteLine("hello world");
-       
-            Console.WriteLine("hello " + auctionItemId);
-            var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
-            if (artSaved.Any())
-            {
-                artToAuction = artSaved.Where(x => x.ArtId == new Guid(auctionItemId)).FirstOrDefault();
-                Console.WriteLine(artToAuction.Description);
 
-            }
-           
-            
-       
-        
-        
+        Console.WriteLine("hello " + auctionItemId);
+        //var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
+        var artSaved = await _artService.GetAllArts();
+
+        if (artSaved.Any())
+        {
+            artToAuction = artSaved.Where(x => x.ArtId == new Guid(auctionItemId)).FirstOrDefault();
+            Console.WriteLine(artToAuction.Description);
+
+        }
+
+
+
+
+
     }
     public async Task AuctionedItem()
     {
         navigation.NavigateTo("/auctioneditems");
         await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "Auction item edited successfully!!");
+    }
+    public async Task EditArt(Art artToAuction)
+    {
+        
+        await _artService.EditArt(artToAuction);
     }
 }

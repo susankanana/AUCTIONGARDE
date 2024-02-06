@@ -15,7 +15,7 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "ArtService", "ArtService\Ar
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BidService", "BidService\BidService.csproj", "{02BF214C-45F9-4250-810A-656A7B1FC9B2}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "OrderService", "OrderService\OrderService.csproj", "{650B6561-C5BD-47CF-9B3B-D2D01D95C852}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OrderService", "OrderService\OrderService.csproj", "{650B6561-C5BD-47CF-9B3B-D2D01D95C852}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution

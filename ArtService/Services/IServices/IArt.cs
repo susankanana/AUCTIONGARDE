@@ -10,7 +10,8 @@ namespace ArtService.Services.IServices
         Task<string> DeleteArt(Art art);
         Task<string> SaveChanges();
         Task<string>UpdateArt(Art art);
-        Task<List<Art>> GetAllArts(string status);
+        Task<List<Art>> GetAllArtsStatusTrue(string status);
+        Task<List<Art>> GetAllArts();
         Task<string> UpdateArtHighestBid(Guid artId, int highestBid);
     }
 }

@@ -13,7 +13,7 @@
                 <div class="text_top">Popular Collections</div>
                 <div class="text_bottom">
                     <div>Abstract African woman canvas painting</div>
-                    <a href="#" class="text-success">VIEW AUCTIONS</a>
+                    <a href="/auctionbuy" class="text-success">VIEW AUCTIONS</a>
                 </div>
                 </div>
         </div>
@@ -25,7 +25,7 @@
                 <div class="text_top">Popular Collections</div>
                 <div class="text_bottom">
                     <div>Abstract African woman canvas painting</div>
-                    <a href="#" class="text-success">VIEW AUCTIONS</a>
+                    <a href="/auctionbuy" class="text-success">VIEW AUCTIONS</a>
                 </div>
         </div>
             
@@ -38,7 +38,7 @@
                 <div class="text_top">Popular Collections</div>
                 <div class="text_bottom">
                     <div>Abstract African woman canvas painting</div>
-                    <a href="#" class="text-success">VIEW AUCTIONS</a>
+                    <a href="/auctionbuy" class="text-success">VIEW AUCTIONS</a>
                 </div>
         </div>
         </div>
@@ -62,25 +62,117 @@
             <img class="youtube" src="images/youtube (1).svg"/>
         </div>
         </div>
-        <div class="footer_home">
-            
-            <div class="footer_link">
-                <p>Support</p>
-                <i class="material-icons">arrow_drop_down</i>
+       
+    </div>
+    <div class="footer_home">
 
+        <div class="footer_link">
+            <div class="support_div">
+                <h3>About us</h3>
+                <i class="material-icons collapsible" id="ärrow_btn">arrow_drop_down</i>
             </div>
-            <hr />
-            <div class="footer_link">
-                <p>Privacy</p>
-                <i class="material-icons">arrow_drop_down</i>
+
+            <div class="mycontent">
+                <p>
+                    We are an art selling company that believes in the power of art to transform lives. We offer a wide variety of black women art, from paintings and sculptures to photography and textiles, to suit all tastes and budgets.
+                    
+                </p>
+                <ul>
+                    <li>This company was established in January 2024 with only 10 diamond category art pieces in a small room in Nyeri!!</li>
+                    <li>Our mission is to ensure all our users have the best experience</li>
+                    <li>We stand by authenticity and equal opportunities for all</li>
+                    <li>We offer a platform for all artists and art lovers around the world to interact and share art that tell stories of black african women</li>
+                    <li>Conatct info: suzzannekans@gmail.com  +254 790690306</li>
+                </ul>
                 
             </div>
-            <hr />
         </div>
+
+        <hr />
+        <div class="footer_link">
+            <div class="privacy_div">
+                <h3>Privacy & Policy</h3>
+                <div><i class="material-icons collapsible" id="ärrow_btn2">arrow_drop_down</i></div>
+            </div>
+
+            <div>
+                <div class="mycontent2">
+                    <p>This privacy policy describes how we collect, use, and share your personal information when you visit or make a purchase from our website.</p>
+                    <br />
+                    <h4>
+                        What personal information do we collect?
+                    </h4>
+                    <p> When you visit our website, we collect certain information about your device, including your IP address, browser type, and operating system. 
+                        We also collect information about the pages you visit on our website, the time you spend on each page, and the links you click.</p>
+                    <br />
+                    <h4>
+                        We use the information we collect from you to:
+                    </h4>
+                    <ul>
+                        <li>Process your orders and deliver your purchases</li>
+                        <li>Communicate with you about your orders</li>
+                        <li>Improve our website and shopping experience</li>
+                        <li>Send you marketing emails, if you have opted in to receive them</li>
+                        <li>Target our marketing efforts</li>
+                        <li>Protect our legal rights</li>
+                    </ul>
+                    <br />
+                    <h4>
+                        Who do we share your personal information with?
+
+                    </h4>
+                    <p>
+                        We share your personal information with third-party companies who help us operate our website and deliver our services to you. These companies may 
+                        have access to your personal information only to the extent necessary to perform their services for us.
+                        We also share your personal information with third parties when you give us your consent to do so. For example, 
+                        if you share your email address with us to receive marketing emails, we may share your email address with our marketing partners.
+                    </p>
+
+                </div>
+            </div>
+
+        </div>
+
+        <hr />
     </div>
     
 
     <script>
+        var coll = document.getElementsByClassName("collapsible");
+
+        var ärrow_btn = document.getElementById("ärrow_btn");
+        var ärrow_btn2 = document.getElementById("ärrow_btn2");
+        ärrow_btn.addEventListener('click', toggleContent);
+        ärrow_btn2.addEventListener('click', toggleContent2);
+        let mycontent = document.querySelector(".mycontent");
+        let mycontent2 = document.querySelector(".mycontent2");
+
+        function toggleContent()
+        {
+            mycontent.classList.toggle("show_content")
+
+        }
+
+
+        function toggleContent2() {
+            mycontent2.classList.toggle("show_content")
+
+        }
+
+
+        var i;
+
+        for (i = 0; i < coll.length; i++) {
+            coll[i].addEventListener("click", function () {
+                this.classList.toggle("active");
+                var content = this.nextElementSibling;
+                if (content.style.display === "block") {
+                    content.style.display = "none";
+                } else {
+                    content.style.display = "block";
+                }
+            });
+        }
         let slideIndex = 1;
         showSlides(slideIndex);
 
@@ -114,5 +206,12 @@
 </html>
 
 @code {
+    public string toggleStyles = "display:none;";
+
+
+    public void ToggleContent()
+    {
+
+    }
 
 }

@@ -26,6 +26,12 @@
         <label for="password">Password:</label><br>
         <InputText @bind-Value="registerUser.Password" class="form-control input_item"  id="password" type="password"></InputText>
             <ValidationMessage For="@(()=>registerUser.Password)" />
+            <label for="dropdown">Select a Role:</label><br>
+            <InputSelect @bind-Value="registerUser.Role" class="form-control input_item" id="dropdown">
+                <option value="">Select a role</option>
+                <option value="Bidder">Bidder</option>
+                <option value="Seller">Seller</option>
+            </InputSelect><br />
         <input type="submit" value="Register"><br /><br />
         <input type="checkbox" id="condition" name="condition">
         <label for="condition"> Accept terms and conditions</label><br><br />

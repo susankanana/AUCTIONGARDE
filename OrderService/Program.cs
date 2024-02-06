@@ -36,6 +36,13 @@ builder.Services.AddHttpClient("Users", c => c.BaseAddress = new Uri(builder.Con
 builder.Services.AddHttpClient("Arts", c => c.BaseAddress = new Uri(builder.Configuration.GetValue<string>("ServiceURl:ArtService")));
 builder.Services.AddHttpClient("Bids", c => c.BaseAddress = new Uri(builder.Configuration.GetValue<string>("ServiceURl:BidService")));
 
+builder.Services.AddCors(options => options.AddPolicy("policy1", build =>
+{
+    build.AllowAnyOrigin();
+    build.AllowAnyHeader();
+    build.AllowAnyMethod();
+}));
+
 var app = builder.Build();
 
 Stripe.StripeConfiguration.ApiKey = builder.Configuration.GetValue<string>("Stripe:Key");
@@ -46,6 +53,8 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseCors("policy1");
 
 app.UseMigrations();
 

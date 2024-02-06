@@ -81,14 +81,20 @@ namespace AuthService.Services
         }
        
 
-        public async Task<string> RegisterUser(RegisterUserDto userDto)
+        public async Task<string> RegisterUser(RegisterUserDto userDto, string RoleName)
         {
+            if (!_roleManager.RoleExistsAsync(RoleName).GetAwaiter().GetResult())
+            {
+                await _roleManager.CreateAsync(new IdentityRole(RoleName));
+            }
             try {
                 var user = _mapper.Map<ApplicationUser>(userDto);
                 //create user
                 var result = await _userManager.CreateAsync(user, userDto.Password);
                 if (result.Succeeded)
                 {
+                    //assign the user the role
+                    await _userManager.AddToRoleAsync(user, RoleName);
                     return string.Empty;
                 }
                 else
@@ -101,9 +107,16 @@ namespace AuthService.Services
             }
             
         }
-        
 
-        
+        public async Task<string> RemoveUser(ApplicationUser user)
+        {
+            _context.ApplicationUsers.Remove(user);
+            await _context.SaveChangesAsync();
+            return "User Removed!!";
+        }
+
+
+
         //to assign a user a role after a successfull registration
         //public async Task<string> RegisterUser(RegisterUserDto userDto)
         //{

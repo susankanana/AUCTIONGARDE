@@ -14,7 +14,7 @@ namespace AUCTIONGARDE_Frontend.Models.Bid
         public Guid bidderId { get; set; }
         [ForeignKey("artId")]
         public Guid artId { get; set; }
-        public string State { get; set; }
+        public string Status { get; set; } = string.Empty;
         public DateTime expiryTime { get; set; }
 
 

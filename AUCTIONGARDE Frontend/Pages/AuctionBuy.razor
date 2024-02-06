@@ -1,8 +1,10 @@
-﻿@page "/auctionbuy"
+﻿@page "/auctionbuy/{action?}/{artId?}"
+@using AUCTIONGARDE_Frontend.Models.Bid.Dtos;
 @inject HttpClient Http
 @inject NavigationManager _navigationManager
 @inject IJSRuntime _jsRuntime
 @inject IArt _artService
+@inject IBid _bidService 
 
 <html>
 <head>
@@ -53,7 +55,7 @@
                         <div class="active_info_details_col">
                             <img src="/Images/info-fill.svg"/>
                             <p><b>Highest Bid</b></p>
-                            <div style="color: #E9B6FB">@highestBid</div>
+                            <div style="color: #E9B6FB">@activeArt.HighestBid</div>
                             <p style="font-size: small; color:#919090">You can bid bigger than this number</p>
                         </div>
             </div>
@@ -66,9 +68,9 @@
         </div>
         <div class="active_card">
                     <textarea class="placeholder-text" placeholder="Starting price
-@activeArt.StartPrice.ToString()" @bind="@bid.bidAmount" pattern="[0-9]*" />
+@activeArt.StartPrice.ToString()" @bind="@bid.BidAmount" pattern="[0-9]*" />
 
-                    <button @onclick="PlaceBid">Place Bid</button>
+                    <button @onclick="()=>PlaceBid(bid)">@(isUpdate ? "Update Bid" : "Place Bid")</button>
         </div>
             }
 
@@ -101,12 +103,18 @@
 </html>
 
 @code {
+    [Parameter]
+    public string action { get; set; }
+    [Parameter]
+    public string artId  { get; set; }
+    public Guid bidId { get; set; }
     public List<Art> arts = new List<Art>();
     public List<Art> allArts = new List<Art>();
     public List<Bid> bids = new List<Bid>();
     public string _searchTerm { get; set; }
-    public int highestBid;
-     public Bid bid = new Bid();
+    public bool isUpdate;
+    //public int highestBid;
+    public AddBidDto bid = new AddBidDto();
     // public class Bid
     // {
     //     public int bidAmount { get; set; }
@@ -121,14 +129,16 @@
     // public Product editedProduct;
     protected override async Task OnInitializedAsync()
     {
+       
         @if (activeArt != null)
         {
-            bid.bidAmount = activeArt.StartPrice;
+            bid.BidAmount = activeArt.StartPrice;
         }
 
 
 
-        var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
+        // var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
+        var bidsSaved = await _bidService.GetAllBids();
         if (bidsSaved.Any())
         {
             bids = bidsSaved;
@@ -138,7 +148,7 @@
         //call api to get the products to display
 
         //var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/art.json");
-        var artSaved = await _artService.GetAllArts();
+        var artSaved = await _artService.GetAllArtsStatusTrue();
         if (artSaved.Any())
         {
             toggleShow = "Show All";
@@ -173,19 +183,32 @@
     }
     public void DisplayOnActiveCard(Art art)
     {
-        activeArt = art;
-        var allBids = bids.Where(x => x.artId == art.ArtId).ToList();
-        if(allBids.Count<1)
+        if (!string.IsNullOrEmpty(action) && !string.IsNullOrEmpty(artId))
         {
-            Console.WriteLine("bids empty");
+            isUpdate = true;
+            Guid newArtId = Guid.Parse(artId);
+            activeArt=allArts.Find(e => e.ArtId == newArtId);
 
         }else
         {
-          
-            highestBid = allBids.Max(e => e.bidAmount);
-
-            
+            activeArt = art;
         }
+
+
+
+
+        // var allBids = bids.Where(x => x.artId == art.ArtId).ToList();
+        // if(allBids.Count<1)
+        // {
+        //     Console.WriteLine("bids empty");
+
+        // }else
+        // {
+
+        //     highestBid = allBids.Max(e => e.bidAmount);
+
+
+        // }
 
     }
     public void dispayAll()
@@ -207,15 +230,33 @@
 
 
     }
-    public async Task PlaceBid()
+    public async Task PlaceBid(AddBidDto bid)
     {
-        if(bid.bidAmount > highestBid)
+        // if(bid.bidAmount > highestBid)
+        // {
+        //     highestBid = bid.bidAmount;
+        // }
+        if(isUpdate)
         {
-            highestBid = bid.bidAmount;
+            var bidToUpdate = bids.Where(x => x.artId == new Guid(artId)).FirstOrDefault();
+            if(bidToUpdate!= null)
+            {
+                bidToUpdate.bidAmount = bid.BidAmount;
+                await _bidService.UpdateBid(bidToUpdate);
+                _navigationManager.NavigateTo("/auctionstate");
+                await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "Bid was updated!!");
+            }
+        }else
+        {
+            bid.ArtId = activeArt.ArtId;
+            bid.State = "True";
+            await _bidService.PlaceBid(bid);
+            _navigationManager.NavigateTo("/auctionstate");
+            await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "Bid was placed!!");
         }
-        bid.artId = activeArt.ArtId;
-       // _navigationManager.NavigateTo("/auctionstate");
-        await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "Bid was placed!!");
+       
+        
+       
     }
 
     public void chageState(Object state)

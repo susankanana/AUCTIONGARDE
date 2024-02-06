@@ -3,6 +3,7 @@ using AUCTIONGARDE_Frontend.Services.ArtS;
 using AUCTIONGARDE_Frontend.Services.Auth;
 using AUCTIONGARDE_Frontend.Services.AuthProv;
 using AUCTIONGARDE_Frontend.Services.BidS;
+using AUCTIONGARDE_Frontend.Services.OrderS;
 using Blazored.LocalStorage;
 using Microsoft.AspNetCore.Components.Authorization;
 using Microsoft.AspNetCore.Components.Web;
@@ -17,6 +18,7 @@ builder.Services.AddScoped<IAuthLogin, AuthServiceLogin>();
 builder.Services.AddScoped<IUser, UserService>();
 builder.Services.AddScoped<IArt, ArtService>();
 builder.Services.AddScoped<IBid, BidService>();
+builder.Services.AddScoped<IOrder, OrderService>();
 builder.Services.AddBlazoredLocalStorage();
 
 builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });

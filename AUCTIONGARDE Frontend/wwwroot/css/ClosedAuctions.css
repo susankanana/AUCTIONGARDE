@@ -20,18 +20,24 @@
     border-radius: 10px;
 }
 .auction_entry {
-    border: 1px solid black;
+    /*border: 1px solid black;*/
     height: 150px;
     width: 100%;
-    border-radius: 10px;
+    /*border-radius: 10px;*/
     display: grid;
-    grid-template-columns: repeat(3, 1fr);
+    grid-template-columns: 0.5fr 1.5fr 1fr;
     grid-template-rows: 150px 150px;
-    gap: 10px;
+    gap: 200px;
     align-items: center;
+    justify-content:space-between;
+}
+hr {
+    margin: 30px;
+    height: 0px;
+    border: 2px solid #EDB6FB;
 }
 .button_email {
-    width: 80%;
+    width: 100%;
     background-color: #4CAF50;
     color: white;
     padding: 10px 15px;
@@ -45,3 +51,11 @@
     .button_email:hover {
         background-color: #45a049;
     }
+
+@media only screen and (max-width: 480px) {
+    .auction_entry {
+        
+        gap: 80px;
+        
+    }
+}

@@ -12,5 +12,6 @@ namespace BidService.Models
         public Guid ArtId { get; set; }
         public string Status { get; set; } = string.Empty;
         public DateTime ExpiryTime { get; set; }
+        public DateTime Timestamp { get; set; } = DateTime.Now;
     }
 }

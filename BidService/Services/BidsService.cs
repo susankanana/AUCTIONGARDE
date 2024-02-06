@@ -3,16 +3,19 @@ using BidService.Models;
 using BidService.Services.Iservices;
 using Microsoft.EntityFrameworkCore;
 
+
 namespace BidService.Services
 {
     public class BidsService : IBid
     {
         private readonly ApplicationDbContext _context;
+        private readonly IHttpContextAccessor _httpContextAccessor;
         private readonly IArt _artService;
-        public BidsService(ApplicationDbContext context, IArt artService)
+        public BidsService(ApplicationDbContext context, IArt artService, IHttpContextAccessor httpContextAccessor)
         {
             _context = context;
             _artService = artService;
+            _httpContextAccessor = httpContextAccessor;
         }
 
         public async Task<string> AddBid(Bid bid)
@@ -39,7 +42,16 @@ namespace BidService.Services
 
             return "Bid amount must be greater than or equal to the highest bid.";
         }
-
+        public  async Task<string> DeleteAllBids(Guid artId)
+        {
+            var bids = await GetBidsByArtId(artId);
+            foreach(var bid in bids)
+            {
+                _context.Bids.Remove(bid);
+            }
+            await _context.SaveChangesAsync();
+            return "All bids related to this art removed!!";
+        }
         public async Task<string> DeleteBid(Bid bid)
         {
             // Capture the artId before removing the bid
@@ -79,6 +91,17 @@ namespace BidService.Services
         public async Task<List<Bid>> GetBidsByBidderId(Guid bidderId)
         {
             return await _context.Bids.Where(x => x.BidderId == bidderId).ToListAsync();
+        }
+        public async Task<List<Bid>> GetMostRecentBidsByBidderId(Guid bidderId)
+        {
+            // Get the most recent bids for each unique ArtId
+            var mostRecentBids = await _context.Bids
+                .Where(x => x.BidderId == bidderId)
+                .GroupBy(x => x.ArtId)
+                .Select(group => group.OrderByDescending(x => x.Timestamp).FirstOrDefault())
+                .ToListAsync();
+
+            return mostRecentBids;
         }
         public async Task<List<Bid>> GetBidsByArtId(Guid artId)
         {
@@ -157,6 +180,30 @@ namespace BidService.Services
 
             return wonBids;
 
+        }
+        public async Task<List<Bid>> GetWonBidsOfSellersArt(Guid sellerId)
+        {
+            var expiredBids = await GetExpiredBids();
+            var wonBids = new List<Bid>();
+
+            foreach (var expiredBid in expiredBids)
+            {
+                var sellerIdForArt = await GetSellerIdForArt(expiredBid.ArtId);
+                if (expiredBid.BidAmount == expiredBid.HighestBid && sellerIdForArt == sellerId)
+                {
+                    wonBids.Add(expiredBid);
+                }
+            }
+
+            return wonBids;
+        }
+        public async Task<Guid> GetSellerIdForArt(Guid artId)
+        {
+            //var token = HttpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+            var httpContext = _httpContextAccessor.HttpContext;
+            var token = httpContext.Request.Headers["Authorization"].ToString().Split(" ")[1];
+            var art = await _artService.GetArtById(artId, token);
+            return art.SellerId;
         }
 
         public async Task<string> UpdateBidStatus(List<string> artIds)

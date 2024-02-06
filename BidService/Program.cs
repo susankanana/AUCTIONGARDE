@@ -17,6 +17,8 @@ builder.Services.AddScoped<IArt, ArtsService>();
 builder.Services.AddScoped<IBid, BidsService>(); 
 builder.Services.AddHttpClient("Arts", c => c.BaseAddress = new Uri(builder.Configuration.GetValue<string>("ServiceURl:ArtService")));
 
+// Add HttpContextAccessor
+builder.Services.AddHttpContextAccessor();
 
 builder.Services.AddAutoMapper(AppDomain.CurrentDomain.GetAssemblies());
 

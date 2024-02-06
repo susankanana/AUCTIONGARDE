@@ -2,6 +2,7 @@
 @inject NavigationManager navigation
 @inject IJSRuntime _jsRuntime
 @inject HttpClient Http
+@inject IArt _artService
 
 <html>
 <head>
@@ -35,27 +36,33 @@
             <label for="category">Category:</label><br>
             <InputSelect @bind-Value="artToAuction.Category" class="form-control input_item" id="category">
                 <option value="">Select a category</option>
-                <option value="diamond">Diamond</option>
-                <option value="gold">Gold</option>
+                <option value="Diamond">Diamond</option>
+                <option value="Gold">Gold</option>
 
             </InputSelect>
             <ValidationMessage For="@(()=>artToAuction.Category)" />
-            <input type="submit" value="Add Item to Auction"><br />
+            <input type="submit" value="Add Item to Auction" @onclick="()=>AddArt(artToAuction)"><br />
 
         </EditForm>
     </div>
 </body>
 </html>
 @code {
-    
-    
-    public Art artToAuction = new Art();
 
-    
+
+    // public Art artToAuction = new Art();
+
+    public AddArtDto artToAuction = new AddArtDto();
     public async Task AuctionedItem()
     {
         navigation.NavigateTo("/auctioneditems");
         await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "Auction item uploaded successfully!!");
+    }
+    public async Task AddArt(AddArtDto artToAuction)
+    {
+        artToAuction.Status="True";
+        // artToAuction.newArt = true;
+        await _artService.AddArt(artToAuction);
     }
 }
 

@@ -27,7 +27,8 @@ namespace AuthService.Controllers
         [HttpPost("Register")]
         public async Task<ActionResult<ResponseDto>> RegisterUser(RegisterUserDto registerUserDto)
         {
-            var res = await _userService.RegisterUser(registerUserDto);
+            string role = string.IsNullOrEmpty(registerUserDto.Role) ? "Bidder" : registerUserDto.Role;
+            var res = await _userService.RegisterUser(registerUserDto , role);
             if (string.IsNullOrEmpty(res))
             {
                 //success
@@ -108,5 +109,21 @@ namespace AuthService.Controllers
          return Ok(_response);
         }
 
+        [HttpDelete("{userId}")]
+        public async Task<ActionResult<ResponseDto>> RemoveUser(string userId)
+        {
+            var user = await _userService.GetUserById(userId);
+            if (user == null)
+            {
+                //this was success
+                _response.Result = "User Not Found";
+                _response.IsSuccess = false;
+                return NotFound(_response);
+            }
+            var res = await _userService.RemoveUser(user);
+            _response.Result = res;
+            return Ok(res);
+
+        }
     }
 }

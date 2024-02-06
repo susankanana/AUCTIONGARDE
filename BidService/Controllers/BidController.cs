@@ -43,6 +43,7 @@ namespace BidService.Controllers
             {
                 return BadRequest("Bidding is closed for this art.");
             }
+
             var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
             if (userId == null)
             {
@@ -54,10 +55,14 @@ namespace BidService.Controllers
             bid.BidderId = new Guid(userId);
             bid.ExpiryTime = art.ExpiryTime;
             bid.Status = "True";
-
-            var res = await _bidService.AddBid(bid);
-            _response.Result = res;
-            return Created("", _response);
+            if(bid.BidAmount >= art.StartPrice)
+            {
+                var res = await _bidService.AddBid(bid);
+                _response.Result = res;
+                return Created("", _response);
+            }
+            _response.ErrorMessage = "Bid amount must be higher than start price!";
+            return BadRequest(_response);
 
         }
         [HttpPost("update/bidIds")]
@@ -81,6 +86,22 @@ namespace BidService.Controllers
             }
 
             var res = await _bidService.GetBidsByBidderId(new Guid(userId));
+            _response.Result = res;
+            return Ok(_response);
+
+        }
+        [HttpGet("Bidder/MostRecent")]
+        [Authorize(Roles = "Admin, Bidder, Seller")]
+        public async Task<ActionResult<ResponseDto>> GetMostRecentBidsByBidderId()
+        {
+            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
+            if (userId == null)
+            {
+                _response.ErrorMessage = "You are not authorized";
+                return StatusCode(403, _response);
+            }
+
+            var res = await _bidService.GetMostRecentBidsByBidderId(new Guid(userId));
             _response.Result = res;
             return Ok(_response);
 
@@ -115,6 +136,18 @@ namespace BidService.Controllers
         {
 
             var res = await _bidService.GetWonBids();
+
+            _response.Result = res;
+            return Ok(_response);
+
+        }
+
+        [HttpGet("Won/Seller{sellerId}")]
+        [Authorize(Roles = "Admin, Bidder, Seller")]
+        public async Task<ActionResult<ResponseDto>> GetWonBidsOfSellersArt(Guid sellerId)
+        {
+
+            var res = await _bidService.GetWonBidsOfSellersArt(sellerId);
 
             _response.Result = res;
             return Ok(_response);
@@ -161,6 +194,16 @@ namespace BidService.Controllers
 
         }
 
+        [HttpDelete("{artId}")]
+        [Authorize(Roles = "Admin")]
+        public async Task<ActionResult<ResponseDto>> DeleteAllBids(Guid artId)
+        {
+            
+            var res = await _bidService.DeleteAllBids(artId);
+            _response.Result = res;
+            return Ok(res);
+
+        }
         [HttpPut]
 
         [Authorize(Roles = "Admin, Bidder, Seller")]

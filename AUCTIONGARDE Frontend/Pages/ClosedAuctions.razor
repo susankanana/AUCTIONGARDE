@@ -1,5 +1,12 @@
 ﻿@page "/closedauctions"
 @inject HttpClient Http
+@inject ILocalStorageService _localStorage
+@inject IUser _userService
+@inject IArt _artService
+@inject IBid _bidService
+@inject IOrder _orderService 
+@inject IJSRuntime _jsRuntime
+
 <html>
 <head>
     <link rel="stylesheet" href="/css/ClosedAuctions.css" />
@@ -10,16 +17,23 @@
         <div class="container_closed">
             <div class="title_top">CLOSED AUCTIONS!!</div>
             @foreach(var bid in bids){
+            <div>
             <div class="auction_entry">
                 <i class="material-icons" style="color: #E9B6FB;font-size: 80px">person</i>
                 <div>
-                        <p>@getBidderUsername(bid.bidderId)</p>
-                    <p>@getProductName(bid.artId)</p>
+                        <p>Username: <b>@getBidderUsername(bid.bidderId)</b> </p>
+                        <p>Art Name: <b>@getProductName(bid.artId)</b></p>
                 </div>
                 <div>
-                    <p>Highest Bid</p>
-                    <button class="button_email">Send Invoice</button>
+                    <p>Checkout price @bid.bidAmount</p>
+                            @* <button class="button_email" @onclick="()=>Validate(bid.bidderId , bid.bidId)" disabled="@isPaymentValidated">@(isPaymentValidated ? "VALIDATED" : "Validate Payment")</button> *@
+                            <button class="button_email" @onclick="()=>Validate(bid.bidderId , bid.bidId)"
+                                    disabled="@paymentValidationStatus.ContainsKey(bid.bidId)">
+                                @(paymentValidationStatus.ContainsKey(bid.bidId) ? "VALIDATED" : "Validate Payment")
+                            </button>
                 </div>
+            </div>
+            <hr/>
             </div>
             }
         </div>
@@ -32,39 +46,48 @@
     public List<Art> arts = new List<Art>();
     public List<Bid> bids = new List<Bid>();
     public User activeUser;
+    public List<Order> paidOrders = new List<Order>();
+    // public bool isPaymentValidated;
+    public Dictionary<Guid, bool> paymentValidationStatus = new Dictionary<Guid, bool>();
+
     protected override async Task OnInitializedAsync()
     {
-        var usersSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/test.json");
-        if (usersSaved.Any())
-        {
-            users = usersSaved;
-            activeUser = usersSaved.Take(1).First();
+        var userId = await _localStorage.GetItemAsStringAsync("userId");
+        activeUser = await _userService.GetUserById(userId);
+        arts = await _artService.GetArtsByUserId();
+        bids = await _bidService.GetWonBidsOfSellersArt(new Guid(userId));
+        users = await _userService.GetAllUsers();
+        // var usersSaved = await Http.GetFromJsonAsync<List<User>>("sample-data/test.json");
+        // if (usersSaved.Any())
+        // {
+        //     users = usersSaved;
+        //     activeUser = usersSaved.Take(1).First();
 
 
-        }
-        var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
-        if (bidsSaved.Any())
-        {
-            Console.WriteLine(bids);
-            bids = bidsSaved.Where(x => x.State == "closed").ToList();
+        // }
+        // var bidsSaved = await Http.GetFromJsonAsync<List<Bid>>("sample-data/test_bids.json");
+        // if (bidsSaved.Any())
+        // {
+        //     Console.WriteLine(bids);
+        //     bids = bidsSaved.Where(x => x.State == "closed").ToList();
 
-        }
-        var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
-        if (artSaved.Any())
-        {
-            arts = artSaved.Where(x => x.UserId == activeUser.UserId).ToList();
+        // }
+        // var artSaved = await Http.GetFromJsonAsync<List<Art>>("sample-data/test_art.json");
+        // if (artSaved.Any())
+        // {
+        //     arts = artSaved.Where(x => x.SellerId == activeUser.UserId).ToList();
 
 
 
-        }
+        // }
     }
 
     public string getBidderUsername(Guid bidderId)
     {
-        var bidder = users.FirstOrDefault(user => user.UserId == bidderId);
+        var bidder = users.FirstOrDefault(user => user.Id == bidderId);
         if(bidder != null)
         {
-            return bidder.FName+bidder.LName;
+            return bidder.FName + " " + bidder.LName;
         }
         return "";
 
@@ -78,5 +101,22 @@
         }
         return "";
     }
+    public async Task Validate(Guid bidderId , Guid bidId)
+    {
+        paidOrders = await _orderService.GetOrdersByUserId(bidderId);
+        var currentOrder = paidOrders.Where(x => x.BidId == bidId).FirstOrDefault();
+        if(currentOrder != null)
+        {
+            await _orderService.ValidatePayment(currentOrder.OrderId);
+            await _jsRuntime.InvokeVoidAsync("ShowMessage", "success", "Payment validation was successfull and user was notified :)");
 
+            // if(currentOrder.Status == "Paid")
+            // {
+            //     isPaymentValidated = true;
+            // }
+            paymentValidationStatus[bidId] = true;
+
+        }
+        
+    }
 }

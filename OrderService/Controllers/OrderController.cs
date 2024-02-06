@@ -72,20 +72,32 @@ namespace OrderService.Controllers
             return Ok(_response);
         }
 
-        [HttpGet]
-        public async Task<ActionResult<ResponseDto>> GetOrderByUserId()
+        [HttpGet("User/{userId}")]
+        [Authorize]
+        public async Task<ActionResult<ResponseDto>> GetOrderByUserId(Guid userId)
         {
-            var userId = User.Claims.FirstOrDefault(claim => claim.Type == ClaimTypes.NameIdentifier)?.Value;
-            if (userId == null)
-            {
-                _response.ErrorMessage = "You are not authorized. Log in first.";
-                return StatusCode(500, _response);
-            }
-            var order = await _orderService.GetOrderByUserId(new Guid(userId));
+            var order = await _orderService.GetOrderByUserId(userId);
 
             if (order == null)
             {
                 _response.ErrorMessage = "You have not placed an order yet .";
+                return NotFound(_response);
+            }
+
+            _response.Result = order;
+            return Ok(_response);
+        }
+
+        [HttpGet("{orderId}")]
+        [Authorize]
+        public async Task<ActionResult<ResponseDto>> GetOrderById(Guid orderId)
+        {
+         
+            var order = await _orderService.GetOrderById(orderId);
+
+            if (order == null)
+            {
+                _response.ErrorMessage = "Order not found.";
                 return NotFound(_response);
             }
 

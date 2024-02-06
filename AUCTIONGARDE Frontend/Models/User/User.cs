@@ -5,7 +5,7 @@ namespace AUCTIONGARDE_Frontend.Models.User
     public class User
     {
         [Key]
-        public Guid UserId { get; set; }
+        public Guid Id { get; set; }
         public string FName { get; set; } = string.Empty;
         public string LName { get; set; } = string.Empty;
 
