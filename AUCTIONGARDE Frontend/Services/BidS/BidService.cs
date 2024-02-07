@@ -12,7 +12,8 @@ namespace AUCTIONGARDE_Frontend.Services.BidS
     {
         private readonly HttpClient _httpClient;
         private readonly ILocalStorageService _localStorage;
-        private readonly string BASEURL = "https://localhost:7249";
+        //private readonly string BASEURL = "https://localhost:7249"; 
+        private readonly string BASEURL = "https://localhost:7119";
         public BidService(HttpClient httpClient, ILocalStorageService localStorage)
         {
             _httpClient = httpClient;

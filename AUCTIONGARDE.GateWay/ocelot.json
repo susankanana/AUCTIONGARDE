@@ -1,0 +1,295 @@
+﻿{
+    "Routes": [
+
+      //ArtService
+      {
+        "DownstreamPathTemplate": "/api/Art",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7223
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Art",
+        "UpstreamHttpMethod": [ "Get" ]
+      },
+      {
+        "DownstreamPathTemplate": "/api/Art",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7223
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Art",
+        "UpstreamHttpMethod": [ "Put" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Art",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7223
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Art",
+        "UpstreamHttpMethod": [ "Post" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" } //passes the token to server
+      },
+      {
+        "DownstreamPathTemplate": "/api/Art/State",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7223
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Art/State",
+        "UpstreamHttpMethod": [ "Put" ]
+      },
+      {
+        "DownstreamPathTemplate": "/api/Art/Seller",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7223
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Art/Seller",
+        "UpstreamHttpMethod": [ "Get" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Art/{Id}",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7223
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Art/{Id}",
+        "UpstreamHttpMethod": [ "Get", "Delete" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Art/True",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7223
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Art/True",
+        "UpstreamHttpMethod": [ "Get" ]
+      },
+      {
+        "DownstreamPathTemplate": "/api/Art/UpdateHighestBid/{artId}/{highestBid}",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7223
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Art/UpdateHighestBid/{artId}/{highestBid}",
+        "UpstreamHttpMethod": [ "Get" ]
+      },
+
+      //BidService
+      {
+        "DownstreamPathTemplate": "/api/Bid",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7249
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Bid",
+        "UpstreamHttpMethod": [ "Get", "Post", "Delete", "Put" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Bid/update/bidIds",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7249
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Bid/update/bidIds",
+        "UpstreamHttpMethod": [ "Post" ]
+      },
+      {
+        "DownstreamPathTemplate": "/api/Bid/Bidder",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7249
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Bid/Bidder",
+        "UpstreamHttpMethod": [ "Get" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Bid/Bidder/MostRecent",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7249
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Bid/Bidder/MostRecent",
+        "UpstreamHttpMethod": [ "Get" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Bid/Expired",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7249
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Bid/Expired",
+        "UpstreamHttpMethod": [ "Get" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Bid/Won",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7249
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Bid/Won",
+        "UpstreamHttpMethod": [ "Get" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Bid/Won/Seller{sellerId}",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7249
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Bid/Won/Seller{sellerId}",
+        "UpstreamHttpMethod": [ "Get" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Bid/{artId}",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7249
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Bid/{artId}",
+        "UpstreamHttpMethod": [ "Get", "Delete" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Bid/BidId/{Id}",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7249
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Bid/BidId/{Id}",
+        "UpstreamHttpMethod": [ "Get" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+
+      //OrderService
+      {
+        "DownstreamPathTemplate": "/api/Order",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7171
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Order",
+        "UpstreamHttpMethod": [ "Post" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Order/User/{userId}",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7171
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Order/User/{userId}",
+        "UpstreamHttpMethod": [ "Get" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Order/{orderId}",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7171
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Order/{orderId}",
+        "UpstreamHttpMethod": [ "Get" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Order/Pay",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7171
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Order/Pay",
+        "UpstreamHttpMethod": [ "Post" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      },
+      {
+        "DownstreamPathTemplate": "/api/Order/validate/{orderId}",
+        "DownstreamScheme": "https",
+        "DownstreamHostAndPorts": [
+          {
+            "Host": "localhost",
+            "Port": 7171
+          }
+        ],
+        "UpstreamPathTemplate": "/api/Order/validate/{orderId}",
+        "UpstreamHttpMethod": [ "Post" ],
+        "AuthenticationOptions": { "AuthenticationProviderKey": "Bearer" }
+      }
+    ],
+  "GlobalConfiguration": {
+    "BaseUrl": "https://localhost:7119"
+  }
+
+}

@@ -13,7 +13,8 @@ namespace AUCTIONGARDE_Frontend.Services.OrderS
     public class OrderService : IOrder
     {
         private readonly HttpClient _httpClient;
-        private readonly string BASEURL = "https://localhost:7171";
+        //private readonly string BASEURL = "https://localhost:7171"; 
+        private readonly string BASEURL = "https://localhost:7119";
         private readonly ILocalStorageService _localStorage;
         private readonly NavigationManager _navigation;
         public OrderService(HttpClient httpClient, ILocalStorageService localStorage, NavigationManager navigation)
